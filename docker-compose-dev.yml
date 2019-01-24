@@ -20,7 +20,7 @@ services:
       context: .
       dockerfile: Dockerfile-dev
     volumes:
-     - .:/var/www/html:z
+     - .:/var/www/html
      - ./php.xdebug.ini:/usr/local/etc/php/php.ini:z
     environment:
       DM_SERVER_ADDRESS: "$DM_SERVER_HOST:$DM_SERVER_PORT"

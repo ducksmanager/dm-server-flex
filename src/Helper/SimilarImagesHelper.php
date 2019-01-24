@@ -1,25 +1,24 @@
 <?php
 namespace App\Helper;
 
-use App\EntityTransforms\SimilarImagesOutput;
+use App\EntityTransform\SimilarImagesResult;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\File;
 
-trait similarImagesHelper {
+class SimilarImagesHelper {
+
     /** @var string $mockedResults */
     public static $mockedResults;
-
-    /** @var string $sampleCover */
-    public static $sampleCover = 'https://outducks.org/au/bp/001/au_bp_001a_001.jpg';
 
     /**
      * @param string $pastecHost
      * @return string
      * @throws \InvalidArgumentException
      */
-    private static function getPastecUrl($pastecHost = null): string {
+    private static function getPastecUrl($pastecHost = null): string
+    {
         $PASTEC_HOSTS=explode(',', $_ENV['PASTEC_HOSTS']);
         if (is_null($pastecHost)) {
             $pastecHost = $PASTEC_HOSTS[0];
@@ -37,7 +36,8 @@ trait similarImagesHelper {
      * @return int
      * @throws \InvalidArgumentException|\RuntimeException
      */
-    public static function getIndexedImagesNumber($pastecHost): ?int {
+    public static function getIndexedImagesNumber($pastecHost): ?int
+    {
         $pastecUrl = self::getPastecUrl($pastecHost);
         if (!is_null(self::$mockedResults)) {
             $response = self::$mockedResults;
@@ -56,19 +56,21 @@ trait similarImagesHelper {
         if (is_null($resultArray)) {
             throw new RuntimeException('Pastec is unreachable');
         }
-        if ($resultArray['type'] === 'INDEX_IMAGE_IDS') {
-            return count($resultArray['image_ids']);
+        if ($resultArray['type'] !== 'INDEX_IMAGE_IDS') {
+            throw new InvalidArgumentException("Invalid return type : {$resultArray['type']}");
         }
-        throw new InvalidArgumentException("Invalid return type : {$resultArray['type']}");
+
+        return count($resultArray['image_ids']);
     }
 
     /**
-     * @param File            $file
+     * @param File $file
      * @param LoggerInterface $logger
-     * @param string          $pastecHost
-     * @return SimilarImagesOutput
+     * @param string $pastecHost
+     * @return SimilarImagesResult
      */
-    public static function getSimilarImages(File $file, LoggerInterface $logger, $pastecHost = 'pastec'): SimilarImagesOutput {
+    public static function getSimilarImages(File $file, LoggerInterface $logger, $pastecHost = 'pastec'): SimilarImagesResult
+    {
         $pastecUrl = self::getPastecUrl($pastecHost);
         if (!is_null(self::$mockedResults)) {
             $response = self::$mockedResults;
@@ -88,6 +90,6 @@ trait similarImagesHelper {
             $logger->info($response);
             // @codeCoverageIgnoreEnd
         }
-        return SimilarImagesOutput::createFromJsonEncodedResult($response);
+        return SimilarImagesResult::createFromJsonEncodedResult($response);
     }
 }

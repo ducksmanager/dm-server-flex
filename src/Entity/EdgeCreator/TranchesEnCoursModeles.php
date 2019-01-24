@@ -3,6 +3,7 @@
 namespace App\Models\EdgeCreator;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\OneToMany;
 
 /**
  * TranchesEnCoursModeles
@@ -50,25 +51,18 @@ class TranchesEnCoursModeles
     private $username;
 
     /**
-     * @var string|null
+     * @var TranchesEnCoursModelesImages[]
      *
-     * @ORM\Column(name="NomPhotoPrincipale", type="string", length=60, nullable=true)
+     * @OneToMany(fetch="EAGER", targetEntity="TranchesEnCoursModelesImages", cascade={"persist", "remove"}, mappedBy="idModele")
      */
-    private $nomphotoprincipale;
+    private $photos = [];
 
     /**
-     * @var string|null
+     * @var TranchesEnCoursContributeurs[]
      *
-     * @ORM\Column(name="photographes", type="text", length=65535, nullable=true)
+     * @OneToMany(fetch="EAGER", targetEntity="TranchesEnCoursContributeurs", cascade={"persist", "remove"}, mappedBy="idModele")
      */
-    private $photographes;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="createurs", type="text", length=65535, nullable=true)
-     */
-    private $createurs;
+    private $contributeurs = [];
 
     /**
      * @var bool
@@ -137,40 +131,52 @@ class TranchesEnCoursModeles
         return $this;
     }
 
-    public function getNomphotoprincipale(): ?string
+    /**
+     * Set photos
+     *
+     * @param TranchesEnCoursModelesImages[] $photos
+     *
+     * @return TranchesEnCoursModeles
+     */
+    public function setPhotos($photos)
     {
-        return $this->nomphotoprincipale;
-    }
-
-    public function setNomphotoprincipale(?string $nomphotoprincipale): self
-    {
-        $this->nomphotoprincipale = $nomphotoprincipale;
+        $this->photos = $photos;
 
         return $this;
     }
 
-    public function getPhotographes(): ?string
+    /**
+     * Get photographes
+     *
+     * @return TranchesEnCoursModelesImages[]
+     */
+    public function getPhotos()
     {
-        return $this->photographes;
+        return $this->photos;
     }
 
-    public function setPhotographes(?string $photographes): self
+    /**
+     * Set contributeurs
+     *
+     * @param TranchesEnCoursContributeurs[] $contributeurs
+     *
+     * @return TranchesEnCoursModeles
+     */
+    public function setContributeurs($contributeurs)
     {
-        $this->photographes = $photographes;
+        $this->contributeurs = $contributeurs;
 
         return $this;
     }
 
-    public function getCreateurs(): ?string
+    /**
+     * Get contributeurs
+     *
+     * @return TranchesEnCoursContributeurs[]
+     */
+    public function getContributeurs()
     {
-        return $this->createurs;
-    }
-
-    public function setCreateurs(?string $createurs): self
-    {
-        $this->createurs = $createurs;
-
-        return $this;
+        return $this->contributeurs;
     }
 
     public function getActive(): ?bool

@@ -62,6 +62,28 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
     {
         return $this->container->get('doctrine')->getManager($name);
     }
+
+    /**
+     * @return int
+     */
+    protected function getCurrentUser(): array
+    {
+        return $this->get('session')->get('user');
+    }
+
+    /**
+     * @param Response $response
+     * @param string $idKey
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    protected static function getResponseIdFromServiceResponse(Response $response, $idKey) {
+        if ($response->getStatusCode() !== Response::HTTP_OK) {
+            throw new \RuntimeException($response->getContent(), $response->getStatusCode());
+        }
+
+        return json_decode($response->getContent())->$idKey;
+    }
 }
 
 interface GenericReturnObjectInterface {

@@ -18,6 +18,7 @@
         "php": "^7.2.0",
         "ext-ctype": "*",
         "ext-curl": "*",
+        "ext-exif": "*",
         "ext-iconv": "*",
         "ext-json": "*",
         "api-platform/api-pack": "^1.2",
@@ -30,6 +31,9 @@
         "symfony/orm-pack": "^1.0",
         "symfony/profiler-pack": "^1.0",
         "symfony/security-bundle": "4.2.*",
+        "symfony/serializer": "4.2.*",
+        "symfony/swiftmailer-bundle": "^3.2",
+        "symfony/twig-bundle": "4.2.*",
         "symfony/yaml": "4.2.*"
     },
     "config": {
@@ -84,6 +88,7 @@
         "symfony/css-selector": "4.2.*",
         "symfony/maker-bundle": "^1.11",
         "symfony/phpunit-bridge": "4.2.*",
-        "symfony/web-server-bundle": "4.2.*"
-    }
+        "symfony/web-server-bundle": "4.2.*",
+	    "ext-exif": "*"
+	}
 }
