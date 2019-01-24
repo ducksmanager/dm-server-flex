@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EntityTransforms;
+namespace App\EntityTransform;
 
 class SimilarImagesOutput
 {

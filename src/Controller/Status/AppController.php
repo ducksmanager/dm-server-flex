@@ -12,7 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class AppController extends AbstractController
 {
     use dbQueryHelper;
-    use similarImagesHelper;
 
     /**
      * @Route(methods={"GET"}, path="/status/db"))
@@ -52,7 +51,7 @@ class AppController extends AbstractController
         $log = [];
 
         try {
-            $outputObject = self::getSimilarImages(new File(self::$sampleCover, false), $logger, $pastecHost);
+            $outputObject = SimilarImagesHelper::getSimilarImages(new File(SimilarImagesHelper::$sampleCover, false), $logger, $pastecHost);
             $matchNumber = count($outputObject->getImageIds());
             if ($matchNumber > 0) {
                 $log[] = "Pastec search returned $matchNumber image(s)";
