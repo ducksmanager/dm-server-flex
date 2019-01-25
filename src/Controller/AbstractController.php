@@ -7,16 +7,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
 {
-    protected function callInternal($class, $function, $parameters): Response
+    protected function callInternal(string $class, string $function, array $parameters): Response
     {
         return $this->forward($class.'::'.$function, $parameters);
     }
 
-    /**
-     * @param array $array
-     * @return array
-     */
-    protected static function getSerializedArray($array): array
+    protected static function getSerializedArray(array $array): array
     {
         return array_map('serialize', $array);
     }
@@ -36,36 +32,21 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
             }, $objectArray);
     }
 
-    /**
-     * @param array $array
-     * @return array
-     */
-    protected static function getUnserializedArray($array): array
+    protected static function getUnserializedArray(array $array): array
     {
         return array_map('unserialize', $array);
     }
 
-    /**
-     * @param string $json
-     * @return array
-     */
-    protected static function getUnserializedArrayFromJson($json): array
+    protected static function getUnserializedArrayFromJson(string $json): array
     {
         return self::getUnserializedArray((array)json_decode($json));
     }
 
-    /**
-     * @param string $name
-     * @return EntityManager
-     */
-    protected function getEm($name): EntityManager
+    protected function getEm(string $name): EntityManager
     {
         return $this->container->get('doctrine')->getManager($name);
     }
 
-    /**
-     * @return int
-     */
     protected function getCurrentUser(): array
     {
         return $this->get('session')->get('user');
@@ -77,7 +58,7 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
      * @return mixed
      * @throws \RuntimeException
      */
-    protected static function getResponseIdFromServiceResponse(Response $response, $idKey) {
+    protected static function getResponseIdFromServiceResponse(Response $response, string $idKey) {
         if ($response->getStatusCode() !== Response::HTTP_OK) {
             throw new \RuntimeException($response->getContent(), $response->getStatusCode());
         }
