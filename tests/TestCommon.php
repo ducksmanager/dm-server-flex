@@ -49,13 +49,6 @@ abstract class TestCommon extends WebTestCase {
         }
     }
 
-    protected function tearDown() {
-        foreach($this->getEmNameToCreate() as $emToDrop) {
-            self::runCommand("doctrine:database:drop --force --connection=$emToDrop");
-        }
-        parent::tearDown();
-    }
-
     protected function spinUp($emName): void
     {
         self::runCommand("doctrine:database:drop --force --connection=$emName");
