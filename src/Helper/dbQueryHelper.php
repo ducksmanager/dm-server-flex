@@ -43,7 +43,7 @@ trait dbQueryHelper {
         }
 
         $responseText = print_r($results, true);
-        $logger->info("DB check for $dbName failed because not data could be fetched");
+        $logger->info("DB check for $dbName failed because no data could be fetched");
         return "Error for $dbName : received response $responseText";
     }
 
