@@ -14,6 +14,37 @@ class AppController extends AbstractController
     use dbQueryHelper;
 
     /**
+     * @Route(
+     *     methods={"GET"},
+     *     path="/status/pastec/{pastecHost}",
+     *     requirements={"pastecHost"="^(?P<pastec_host_regex>[-_a-z0-9]+)$"},
+     *     defaults={"pastecHost"="pastec"}
+     * )
+     */
+    public function getPastecStatus(string $pastecHost) : Response {
+        $log = [];
+
+        try {
+            $pastecIndexesImagesNumber = SimilarImagesHelper::getIndexedImagesNumber($pastecHost);
+            if ($pastecIndexesImagesNumber > 0) {
+                $log[] = "Pastec OK with $pastecIndexesImagesNumber images indexed";
+            }
+            else {
+                throw new \Exception('Pastec has no images indexed');
+            }
+        }
+        catch(\Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $output = implode('<br />', $log);
+        if (isset($error)) {
+            return new Response($error, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        return new Response($output);
+    }
+
+    /**
      * @Route(methods={"GET"}, path="/status/db"))
      * @param LoggerInterface $logger
      * @return Response

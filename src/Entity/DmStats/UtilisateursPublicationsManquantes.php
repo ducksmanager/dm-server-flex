@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * UtilisateursPublicationsManquantes
  *
- * @ORM\Table(name="utilisateurs_publications_manquantes", indexes={@ORM\Index(name="user_stories", columns={"ID_User", "personcode", "storycode"}), @ORM\Index(name="issue", columns={"ID_User", "publicationcode", "issuenumber"})})
+ * @ORM\Table(name="utilisateurs_publications_manquantes", indexes={@ORM\Index(name="user_stories", columns={"ID_User", "personcode", "storycode"}), @ORM\Index(name="missing_issue_for_user", columns={"ID_User", "publicationcode", "issuenumber"})})
  * @ORM\Entity
  */
 class UtilisateursPublicationsManquantes

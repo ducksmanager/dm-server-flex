@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AppController extends AbstractController
 {
     /**
-     * @Route(methods={"GET"}, path="/coa/list/countries/{locale}/{countryCodes}", defaults={"countryCodes"=""}))
+     * @Route(methods={"GET"}, path="/coa/list/countries/{locale}/{countryCodes}", defaults={"countryCodes"=""})
      */
     public function listCountriesFromCodes(string $locale, ?string $countryCodes): Response
     {

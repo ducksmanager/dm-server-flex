@@ -5,12 +5,12 @@ namespace App\Models\DmStats;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * AuteursPseudosSimple
+ * AuteursPseudos
  *
- * @ORM\Table(name="auteurs_pseudos_simple", uniqueConstraints={@ORM\UniqueConstraint(name="auteurs_pseudos_simple_ID_User_NomAuteurAbrege_uindex", columns={"ID_User", "NomAuteurAbrege"})}, indexes={@ORM\Index(name="index_auteur_inducks", columns={"NomAuteurAbrege"})})
+ * @ORM\Table(name="auteurs_pseudos", uniqueConstraints={@ORM\UniqueConstraint(name="auteurs_pseudos_ID_User_NomAuteurAbrege_uindex", columns={"ID_User", "NomAuteurAbrege"})}, indexes={@ORM\Index(name="index_auteur_inducks", columns={"NomAuteurAbrege"})})
  * @ORM\Entity
  */
-class AuteursPseudosSimple
+class AuteursPseudos
 {
     /**
      * @var int

@@ -1,24 +1,24 @@
 <?php
 namespace DmServer\Test;
 
-use App\Helper\similarImagesHelper;
+use App\Helper\SimilarImagesHelper;
+use App\Tests\Controller\CoverIdTest;
+use App\Tests\Fixtures\CoverIdFixture;
+use App\Tests\Fixtures\EdgeCreatorFixture;
 use App\Tests\TestCommon;
 use Symfony\Component\HttpFoundation\Response;
 
 class StatusTest extends TestCommon
 {
-    use similarImagesHelper;
-
     private function getCoverIdStatusForMockedResults($url, $mockedResults): Response {
-        $user = self::createTestCollection();
-        self::setSessionUser($this->app, $user);
-
-        self::$mockedResults = $mockedResults;
+        $this->createUserCollection('dm_test_user');
+        SimilarImagesHelper::$mockedResults = $mockedResults;
 
         return $this->buildAuthenticatedService($url, self::$dmUser, [], [], 'GET')->call();
     }
 
     public function testGetCoverIdStatus(): void {
+        $this->spinUp('dm');
         $response = $this->getCoverIdStatusForMockedResults(
             '/status/pastec',
             json_encode([
@@ -31,6 +31,7 @@ class StatusTest extends TestCommon
     }
 
     public function testGetCoverIdStatusInvalidHost(): void {
+        $this->spinUp('dm');
         $response = $this->getCoverIdStatusForMockedResults(
             '/status/pastec/invalidpastechost',
             json_encode([])
@@ -42,6 +43,7 @@ class StatusTest extends TestCommon
     }
 
     public function testGetCoverIdStatusNoCoverData(): void {
+        $this->spinUp('dm');
         $response = $this->getCoverIdStatusForMockedResults(
             '/status/pastec',
             json_encode([
@@ -56,6 +58,7 @@ class StatusTest extends TestCommon
     }
 
     public function testGetCoverIdStatusInvalidCoverData(): void {
+        $this->spinUp('dm');
         $response = $this->getCoverIdStatusForMockedResults(
             '/status/pastec',
             json_encode([
@@ -70,6 +73,7 @@ class StatusTest extends TestCommon
     }
 
     public function testGetCoverIdStatusUnreachable(): void {
+        $this->spinUp('dm');
         $response = $this->getCoverIdStatusForMockedResults(
             '/status/pastec',
             json_encode(null)
@@ -81,6 +85,8 @@ class StatusTest extends TestCommon
     }
 
     public function testGetImageSearchStatus(): void {
+        $this->spinUp('dm');
+        $this->spinUp('co');
         $response = $this->getCoverIdStatusForMockedResults(
             '/status/pastecsearch',
             json_encode(CoverIdTest::$coverSearchResultsSimple)
@@ -90,12 +96,24 @@ class StatusTest extends TestCommon
     }
 
     public function testGetDbStatus(): void {
-        $user = self::createTestCollection();
-        self::setSessionUser($this->app, $user);
-        self::createCoaData();
-        self::createCoverIds();
-        self::createStatsData($user->getId());
-        self::createEdgeCreatorData($user->getId());
+        $this->spinUp('dm');
+        $this->spinUp('coa');
+        $this->spinUp('coverid');
+        $this->spinUp('dmstats');
+        $this->spinUp('edgecreator');
+
+        $this->createUserCollection('dm_test_user');
+        self::runCommand('doctrine:fixtures:load -q -n --em=coa --group=coa');
+        $urls = [
+            'fr/DDD 1' => '2010/12/fr_ddd_001a_001.jpg',
+            'fr/DDD 2' => '2010/12/fr_ddd_002a_001.jpg',
+            'fr/MP 300' => '2010/12/fr_mp_0300a_001.jpg',
+            'fr/XXX 111' => '2010/12/fr_xxx_111_001.jpg'
+        ];
+        foreach($urls as $issueNumber => $url) {
+            $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
+        }
+        $this->loadFixture('edgecreator', new EdgeCreatorFixture($this->getUser('dm_test_user')));
 
         $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
 
@@ -103,10 +121,22 @@ class StatusTest extends TestCommon
     }
 
     public function testGetDbStatusMissingCoaData(): void {
-        $user = self::createTestCollection();
-        self::setSessionUser($this->app, $user);
-        self::createCoverIds();
-        self::createStatsData($user->getId());
+        $this->spinUp('dm');
+        $this->spinUp('coa');
+        $this->spinUp('coverid');
+        $this->spinUp('dmstats');
+        $this->spinUp('edgecreator');
+        $this->createUserCollection('dm_test_user');
+        $urls = [
+            'fr/DDD 1' => '2010/12/fr_ddd_001a_001.jpg',
+            'fr/DDD 2' => '2010/12/fr_ddd_002a_001.jpg',
+            'fr/MP 300' => '2010/12/fr_mp_0300a_001.jpg',
+            'fr/XXX 111' => '2010/12/fr_xxx_111_001.jpg'
+        ];
+        foreach($urls as $issueNumber => $url) {
+            $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
+        }
+        $this->loadFixture('edgecreator', new EdgeCreatorFixture($this->getUser('dm_test_user')));
 
         $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
 
@@ -116,17 +146,16 @@ class StatusTest extends TestCommon
     }
 
     public function testGetDbStatusDBDown(): void {
-        unset(DmServer::$entityManagers[DmServer::CONFIG_DB_KEY_COA]);
+        $this->spinUp('dm');
+        $this->spinUp('coverid');
+        $this->spinUp('dmstats');
+        $this->spinUp('edgecreator');
+        $_ENV['DATABASE_COA_HOST'] = null;
 
-        try {
-            $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
-            $this->assertUnsuccessfulResponse($response, function(Response $response) {
-                $this->assertContains('Error for db_coa : JSON cannot be decoded', $response->getContent());
-            });
-        }
-        finally {
-            self::recreateSchema(DmServer::CONFIG_DB_KEY_COA);
-        }
+        $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
+        $this->assertUnsuccessfulResponse($response, function(Response $response) {
+            $this->assertContains('Error for db_coa : JSON cannot be decoded', $response->getContent());
+        });
     }
 
     public function testGetSwaggerJson(): void {
@@ -135,7 +164,7 @@ class StatusTest extends TestCommon
     }
 
     public function testGetSwaggerJsonNotExisting(): void {
-        DmServer::$settings['swagger_path'] = '/not/existing';
+        $_ENV['SWAGGER_PATH'] = '/not/existing';
         $response = $this->buildAuthenticatedService('/status/swagger.json', self::$dmUser, [], [], 'GET')->call();
         $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
