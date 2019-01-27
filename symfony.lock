@@ -137,6 +137,9 @@
     "symfony/asset": {
         "version": "v4.2.2"
     },
+    "symfony/browser-kit": {
+        "version": "v4.2.2"
+    },
     "symfony/cache": {
         "version": "v4.2.2"
     },
@@ -155,6 +158,9 @@
     "symfony/contracts": {
         "version": "v1.0.2"
     },
+    "symfony/css-selector": {
+        "version": "v4.2.2"
+    },
     "symfony/debug": {
         "version": "v4.2.2"
     },
@@ -162,6 +168,9 @@
         "version": "v4.2.2"
     },
     "symfony/doctrine-bridge": {
+        "version": "v4.2.2"
+    },
+    "symfony/dom-crawler": {
         "version": "v4.2.2"
     },
     "symfony/dotenv": {
