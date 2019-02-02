@@ -1,9 +1,7 @@
 parameters:
-    # Adds a fallback DATABASE_URL if the env var is not set.
-    # This allows you to run cache:warmup even if your
-    # environment variables are not available yet.
-    # You should not need to change this value.
-    env(DATABASE_URL): ''
+    env(DATABASE_DRIVER): 'pdo_mysql'
+    env(DATABASE_SERVER_VERSION): 'mariadb-10.2.16'
+    env(DATABASE_IN_MEMORY): false
 
 doctrine:
     dbal:
@@ -15,8 +13,9 @@ doctrine:
                 port: '%env(DATABASE_DM_PORT)%'
                 user: '%env(DATABASE_DM_USER)%'
                 password: '%env(DATABASE_DM_PASS)%'
-                driver: 'pdo_mysql'
-                server_version: 'mariadb-10.2.16'
+                driver: '%env(DATABASE_DRIVER)%'
+                server_version: '%env(DATABASE_SERVER_VERSION)%'
+                memory: '%env(DATABASE_IN_MEMORY)%'
                 charset: utf8mb4
                 mapping_types:
                     enum: string
@@ -26,8 +25,9 @@ doctrine:
                 port: '%env(DATABASE_COA_PORT)%'
                 user: '%env(DATABASE_COA_USER)%'
                 password: '%env(DATABASE_COA_PASS)%'
-                driver: 'pdo_mysql'
-                server_version: 'mariadb-10.2.16'
+                driver: '%env(DATABASE_DRIVER)%'
+                server_version: '%env(DATABASE_SERVER_VERSION)%'
+                memory: '%env(DATABASE_IN_MEMORY)%'
                 charset: utf8mb4
                 schema_filter: (inducks_countryname|inducks_entry|inducks_entryurl|inducks_issue|inducks_person|inducks_publication|inducks_story|inducks_storyversion)
                 mapping_types:
@@ -38,8 +38,9 @@ doctrine:
                 port: '%env(DATABASE_DM_COVER_ID_PORT)%'
                 user: '%env(DATABASE_DM_COVER_ID_USER)%'
                 password: '%env(DATABASE_DM_COVER_ID_PASS)%'
-                driver: 'pdo_mysql'
-                server_version: 'mariadb-10.2.16'
+                driver: '%env(DATABASE_DRIVER)%'
+                server_version: '%env(DATABASE_SERVER_VERSION)%'
+                memory: '%env(DATABASE_IN_MEMORY)%'
                 charset: utf8mb4
                 mapping_types:
                     enum: string
@@ -49,8 +50,9 @@ doctrine:
                 port: '%env(DATABASE_DM_STATS_PORT)%'
                 user: '%env(DATABASE_DM_STATS_USER)%'
                 password: '%env(DATABASE_DM_STATS_PASS)%'
-                driver: 'pdo_mysql'
-                server_version: 'mariadb-10.2.16'
+                driver: '%env(DATABASE_DRIVER)%'
+                server_version: '%env(DATABASE_SERVER_VERSION)%'
+                memory: '%env(DATABASE_IN_MEMORY)%'
                 charset: utf8mb4
                 mapping_types:
                     enum: string
@@ -60,8 +62,9 @@ doctrine:
                 port: '%env(DATABASE_EDGECREATOR_PORT)%'
                 user: '%env(DATABASE_EDGECREATOR_USER)%'
                 password: '%env(DATABASE_EDGECREATOR_PASS)%'
-                driver: 'pdo_mysql'
-                server_version: 'mariadb-10.2.16'
+                driver: '%env(DATABASE_DRIVER)%'
+                server_version: '%env(DATABASE_SERVER_VERSION)%'
+                memory: '%env(DATABASE_IN_MEMORY)%'
                 charset: utf8mb4
                 mapping_types:
                     enum: string

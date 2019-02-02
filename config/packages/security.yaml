@@ -1,15 +1,20 @@
 security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory: { memory: ~ }
+        app_user_provider:
+            memory:
+                users:
+                    ducksmanager:  { password: '%env(ROLE_PASSWORD_DUCKSMANAGER)%', roles: [ 'ROLE_COLLECTION' ] }
+                    whattheduck: { password: '%env(ROLE_PASSWORD_WHATTHEDUCK)%', roles: [ 'ROLE_COLLECTION' ] }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
-
-            # activate different ways to authenticate
+            http_basic: true
 
             # http_basic: true
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
