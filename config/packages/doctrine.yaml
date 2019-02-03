@@ -2,6 +2,11 @@ parameters:
     env(DATABASE_DRIVER): 'pdo_mysql'
     env(DATABASE_SERVER_VERSION): 'mariadb-10.2.16'
     env(DATABASE_IN_MEMORY): false
+    env(DATABASE_DM_PATH): false
+    env(DATABASE_COA_PATH): false
+    env(DATABASE_DM_COVER_ID_PATH): false
+    env(DATABASE_DM_STATS_PATH): false
+    env(DATABASE_EDGECREATOR_PATH): false
 
 doctrine:
     dbal:
