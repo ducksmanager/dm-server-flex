@@ -1,0 +1,181 @@
+<?php
+
+namespace App\Controller\Coa;
+
+use App\Controller\AbstractController;
+use App\EntityTransforms\SimpleIssueWithCoverId;
+use App\Models\Coa\InducksCountryname;
+use App\Models\Coa\InducksIssue;
+use App\Models\Coa\InducksPublication;
+use App\Models\Coverid\Covers;
+use Doctrine\ORM\Query\Expr\Join;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class AppController extends AbstractController
+{
+    /**
+     * @Route(methods={"GET"}, path="/coa/list/countries/{locale}/{countryCodes}", defaults={"countryCodes"=""}))
+     * @param string $locale
+     * @param string $countryCodes
+     * @return Response
+     */
+    public function listCountriesFromCodes($locale, $countryCodes): Response
+    {
+        $coaEm = $this->getEm('coa');
+        $qb = $coaEm->createQueryBuilder();
+        $qb
+            ->select('inducks_countryname.countrycode, inducks_countryname.countryname')
+            ->from(InducksCountryname::class, 'inducks_countryname')
+            ->where($qb->expr()->eq('inducks_countryname.languagecode', ':locale'));
+        $parameters = [':locale' => $locale];
+
+        if (empty($countryCodes)) {
+            $qb->andWhere($qb->expr()->neq('inducks_countryname.countrycode', ':fakeCountry'));
+            $parameters[':fakeCountry'] = 'fake';
+        } else {
+            $qb->andWhere($qb->expr()->in('inducks_countryname.countrycode', explode(',', $countryCodes)));
+        }
+
+        $results = $qb->getQuery()
+            ->setParameters($parameters)
+            ->getResult();
+        $countryNames = [];
+        array_walk(
+            $results,
+            function ($result) use (&$countryNames) {
+                $countryNames[$result['countrycode']] = $result['countryname'];
+            }
+        );
+        return new JsonResponse($countryNames);
+    }
+
+    /**
+     * @Route(
+     *     methods={"GET"},
+     *     path="/coa/list/publications/{publicationCodes}",
+     *     requirements={"publicationCodes"="^([a-z]+|((?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+),){0,9}[a-z]+/[-A-Z0-9]+)$"}
+     * )
+     * @param string $publicationCodes
+     * @return Response
+     */
+    public function listPublicationsFromPublicationCodes($publicationCodes): Response
+    {
+        $coaEm = $this->getEm('coa');
+        $qb = $coaEm->createQueryBuilder();
+        $qb
+            ->select('inducks_publication.publicationcode, inducks_publication.title')
+            ->from(InducksPublication::class, 'inducks_publication');
+
+        if (preg_match('#^[a-z]+$#', $publicationCodes)) {
+            $qb->where($qb->expr()->like('inducks_publication.publicationcode', "'$publicationCodes/%'"));
+        } else {
+            $qb->where($qb->expr()->in('inducks_publication.publicationcode', explode(',', $publicationCodes)));
+        }
+        $qb->orderBy('inducks_publication.title');
+
+        $results = $qb->getQuery()->getResult();
+        $publicationTitles = [];
+        array_walk(
+            $results,
+            function ($result) use (&$publicationTitles) {
+                $publicationTitles[$result['publicationcode']] = $result['title'];
+            }
+        );
+        return new JsonResponse($publicationTitles);
+    }
+
+    /**
+     * @Route(
+     *     methods={"GET"},
+     *     path="/coa/list/issues/{publicationCode}",
+     *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"}
+     * )
+     * @param string $publicationCode
+     * @return Response
+     */
+    public function listIssuesFromPublicationCode($publicationCode): Response
+    {
+        $coaEm = $this->getEm('coa');
+        $qb = $coaEm->createQueryBuilder();
+        $qb
+            ->select('inducks_issue.issuenumber')
+            ->from(InducksIssue::class, 'inducks_issue');
+
+        $qb->where($qb->expr()->eq('inducks_issue.publicationcode', "'" . $publicationCode . "'"));
+
+        $results = $qb->getQuery()->getResult();
+        $issueNumbers = array_map(
+            function ($issue) {
+                return $issue['issuenumber'];
+            },
+            $results
+        );
+        return new JsonResponse($issueNumbers);
+    }
+
+
+    /**
+     * @Route(
+     *     methods={"GET"},
+     *     path="/coa/list/issuesbycodes/{issueCodes}",
+     *     requirements={"issueCodes"="^((?P<issuecode_regex>[a-z]+/[-A-Z0-9 ]+),){0,3}[a-z]+/[-A-Z0-9 ]+$"}
+     * )
+     * @param string $issueCodes
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function listIssuesFromIssueCodes($issueCodes, LoggerInterface $logger): Response
+    {
+        $coaEm = $this->getEm('coa');
+        $issuecodesList = explode(',', $issueCodes);
+
+        $qbIssueInfo = $coaEm->createQueryBuilder();
+        $qbIssueInfo
+            ->select('inducks_publication.countrycode, inducks_publication.publicationcode, inducks_publication.title, inducks_issue.issuenumber, inducks_issue.issuecode')
+            ->from(InducksIssue::class, 'inducks_issue')
+            ->join(InducksPublication::class, 'inducks_publication', Join::WITH, 'inducks_issue.publicationcode = inducks_publication.publicationcode');
+
+        $qbIssueInfo->where($qbIssueInfo->expr()->in('inducks_issue.issuecode', $issuecodesList));
+
+        $resultsIssueInfo = $qbIssueInfo->getQuery()->getResult();
+
+        $issues = [];
+
+        array_walk(
+            $resultsIssueInfo,
+            function ($issue) use (&$issues) {
+                $issues[$issue['issuecode']] = SimpleIssueWithCoverId::buildWithoutCoverId($issue['countrycode'], $issue['publicationcode'], $issue['title'], $issue['issuenumber']);
+            }
+        );
+
+        $coverInfoEm = $this->getEm('coverid');
+        $qbCoverInfo = $coverInfoEm->createQueryBuilder();
+        $qbCoverInfo
+            ->select('covers.id AS coverid, covers.issuecode')
+            ->from(Covers::class, 'covers');
+
+        $qbCoverInfo->where($qbCoverInfo->expr()->in('covers.issuecode', $issuecodesList));
+
+        $resultsCoverInfo = $qbCoverInfo->getQuery()->getResult();
+
+        array_walk(
+            $resultsCoverInfo,
+            function ($issue) use (&$issues, $logger) {
+
+                if (empty($issues[$issue['issuecode']])) {
+                    $logger->error('No COA data exists for this issue : ' . $issue['issuecode']);
+                    unset($issues[$issue['issuecode']]);
+                } else {
+                    /** @var SimpleIssueWithCoverId $issueObject */
+                    $issueObject = $issues[$issue['issuecode']];
+                    $issueObject->setCoverid($issue['coverid']);
+                }
+            }
+        );
+
+        return new JsonResponse(self::getSimpleArray($issues));
+    }
+}
