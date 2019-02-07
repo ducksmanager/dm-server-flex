@@ -3,6 +3,7 @@
 namespace App\Models\Dm;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * Users
@@ -45,9 +46,9 @@ class Users
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="DateInscription", type="date", nullable=false, options={"default"="0000-00-00"})
+     * @ORM\Column(name="DateInscription", type="date", nullable=false)
      */
-    private $dateinscription = '0000-00-00';
+    private $dateinscription;
 
     /**
      * @var string
@@ -115,9 +116,9 @@ class Users
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="DernierAcces", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="DernierAcces", type="datetime", nullable=false)
      */
-    private $dernieracces = 'CURRENT_TIMESTAMP';
+    private $dernieracces;
 
     public function getId(): ?int
     {
@@ -160,12 +161,12 @@ class Users
         return $this;
     }
 
-    public function getDateinscription(): ?\DateTimeInterface
+    public function getDateinscription(): ?\DateTime
     {
         return $this->dateinscription;
     }
 
-    public function setDateinscription(\DateTimeInterface $dateinscription): self
+    public function setDateinscription(\DateTime $dateinscription): self
     {
         $this->dateinscription = $dateinscription;
 
@@ -280,12 +281,12 @@ class Users
         return $this;
     }
 
-    public function getDernieracces(): ?\DateTimeInterface
+    public function getDernieracces(): ?\DateTime
     {
         return $this->dernieracces;
     }
 
-    public function setDernieracces(\DateTimeInterface $dernieracces): self
+    public function setDernieracces(\DateTime $dernieracces): self
     {
         $this->dernieracces = $dernieracces;
 

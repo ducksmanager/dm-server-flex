@@ -1,22 +1,21 @@
 <?php
 namespace App\Tests\Controller;
 
+use App\Models\Coverid\Covers;
 use App\Tests\TestCommon;
 use Symfony\Component\HttpFoundation\Response;
 
 class CoaListsTest extends TestCommon
 {
+    protected function getEmNameToCreate(): string
+    {
+        return 'coa';
+    }
+
     public function setUp()
     {
         parent::setUp();
-        self::runCommand('doctrine:database:create -q --connection=coa');
         self::runCommand('doctrine:fixtures:load -q -n --em=coa --group=coa');
-    }
-
-    public function tearDown()
-    {
-        self::runCommand('doctrine:database:drop --connection=coa');
-        parent::tearDown();
     }
 
     public function testGetCountryList(): void
@@ -114,6 +113,7 @@ class CoaListsTest extends TestCommon
 
     public function testGetIssueListByIssueCodes(): void
     {
+        $this->spinUp('coverid');
         self::runCommand('doctrine:database:create --connection=coverid');
         self::runCommand('doctrine:schema:update -q --em=coverid');
 
@@ -129,24 +129,22 @@ class CoaListsTest extends TestCommon
         $this->assertEquals('1', $arrayResponse->{'fr/DDD 1'}->issuenumber);
     }
 
-//    public function testGetIssueListByIssueCodesNoCoaIssue(): void
-//    {
-//        try {
-//            DmServer::$entityManagers[DmServer::CONFIG_DB_KEY_COVER_ID]->persist(
-//                $cover = (new Covers())
-//                    ->setIssuecode('fr/DDDDD 1')
-//                    ->setSitecode('webusers')
-//                    ->setUrl('abc.jpg')
-//            );
-//            DmServer::$entityManagers[DmServer::CONFIG_DB_KEY_COVER_ID]->flush();
-//        }
-//        catch (ORMException $e) {
-//            $this->fail("Failed to create cover : {$e->getMessage()}");
-//        }
-//
-//        $response = $this->buildAuthenticatedServiceWithTestUser('/coa/list/issuesbycodes/fr/DDDDD 1', self::$dmUser)->call();
-//
-//        $arrayResponse = json_decode($this->getResponseContent($response));
-//        $this->assertEquals([], $arrayResponse);
-//    }
+    public function testGetIssueListByIssueCodesNoCoaIssue(): void
+    {
+        $this->spinUp('coverid');
+
+        $coveridEm = $this->getEm('coverid');
+        $coveridEm->persist(
+            $cover = (new Covers())
+                ->setIssuecode('fr/DDDDD 1')
+                ->setSitecode('webusers')
+                ->setUrl('abc.jpg')
+        );
+        $coveridEm->flush();
+
+        $response = $this->buildAuthenticatedServiceWithTestUser('/coa/list/issuesbycodes/fr/DDDDD 1', self::$dmUser)->call();
+
+        $arrayResponse = json_decode($this->getResponseContent($response));
+        $this->assertEquals([], $arrayResponse);
+    }
 }

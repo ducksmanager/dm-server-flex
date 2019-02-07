@@ -2,17 +2,21 @@
 
 namespace App\Tests;
 
+use App\Models\Dm\Numeros;
 use App\Models\Dm\Users;
+use App\Tests\Fixtures\DmCollectionFixture;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\HttpFoundation\Session\Session;
 
-class TestCommon extends WebTestCase {
+abstract class TestCommon extends WebTestCase {
 
-    /** @var Application $application  */
-    protected static $application;
     /** @var Client $client  */
     protected static $client;
 
@@ -29,13 +33,36 @@ class TestCommon extends WebTestCase {
     protected static $exampleImage = 'cover_example.jpg';
     private static $roles = ['ducksmanager' => 'ducksmanagerpass'];
 
-    private static function getSystemCredentials($appUser, $version = '1.3+') {
+    /** @var Application $application */
+    protected static $application;
+
+    abstract protected function getEmNameToCreate(): string;
+
+    protected function setUp() {
+        parent::setUp();
+        $this->spinUp($this->getEmNameToCreate());
+    }
+
+    protected function tearDown() {
+        self::runCommand("doctrine:database:drop --connection={$this->getEmNameToCreate()}");
+        parent::tearDown();
+    }
+
+    protected function spinUp($emName): void
+    {
+        self::runCommand("doctrine:database:drop --force --connection=$emName");
+        self::runCommand("doctrine:database:create --connection=$emName");
+        self::runCommand("doctrine:schema:create --em=$emName");
+    }
+
+    private static function getSystemCredentials($appUser, $version = '1.3+'): array
+    {
         return self::getSystemCredentialsNoVersion($appUser) + [
             'HTTP_X_DM_VERSION' => $version
         ];
     }
 
-    protected static function getSystemCredentialsNoVersion($appUser)
+    protected static function getSystemCredentialsNoVersion($appUser): array
     {
         return [
             'HTTP_AUTHORIZATION' => 'Basic '.base64_encode(implode(':', [$appUser, self::$roles[$appUser]]))
@@ -57,6 +84,7 @@ class TestCommon extends WebTestCase {
     {
         if (null === self::$application) {
             self::$client = static::createClient();
+            self::$client->disableReboot();
         }
         $service = new TestServiceCallCommon(self::$client);
         $service->setPath($path);
@@ -112,15 +140,43 @@ class TestCommon extends WebTestCase {
     }
 
     /**
-     * @param Application $app
-     * @param Users $user
+     * @param string $name
+     * @return \Doctrine\Common\Persistence\ObjectManager|object
      */
-    protected static function setSessionUser(Application $app, $user): void
+    protected function getEm($name) {
+        $kernel = static::createKernel(['environment' => 'test']);
+        $kernel->boot();
+        return $kernel->getContainer()->get('doctrine')->getManager($name);
+    }
+
+    /**
+     * @param string $username
+     * @return Users
+     */
+    protected function getUser($username): Users
     {
-//        $app['session']->set('user', [
-//            'username' => $user->getUsername(),
-//            'id' => $user->getId()
-//        ]);
+        return $this->getEm('dm')->getRepository(Users::class)->findOneBy(compact('username'));
+    }
+
+    /**
+     * @param string $username
+     * @return Numeros[]
+     */
+    protected function getUserIssues($username): array
+    {
+        return $this->getEm('dm')
+            ->getRepository(Numeros::class)
+            ->findBy(['idUtilisateur' => $this->getUser($username)->getId()]);
+    }
+
+    protected function createUserCollection($username): void
+    {
+        $loader = new Loader();
+        $loader->addFixture(new DmCollectionFixture($username));
+
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->getEm('dm'), $purger);
+        $executor->execute($loader->getFixtures());
     }
 
     /**

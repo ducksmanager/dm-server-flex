@@ -62,6 +62,14 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
     {
         return $this->container->get('doctrine')->getManager($name);
     }
+
+    /**
+     * @return int
+     */
+    protected function getCurrentUser()
+    {
+        return $this->get('session')->get('user');
+    }
 }
 
 interface GenericReturnObjectInterface {

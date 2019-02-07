@@ -3,7 +3,7 @@
 namespace App\Controller\Coa;
 
 use App\Controller\AbstractController;
-use App\EntityTransforms\SimpleIssueWithCoverId;
+use App\EntityTransform\SimpleIssueWithCoverId;
 use App\Models\Coa\InducksCountryname;
 use App\Models\Coa\InducksIssue;
 use App\Models\Coa\InducksPublication;
