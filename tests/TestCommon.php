@@ -8,12 +8,12 @@ use App\Tests\Fixtures\DmCollectionFixture;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 abstract class TestCommon extends WebTestCase {
 
@@ -30,7 +30,7 @@ abstract class TestCommon extends WebTestCase {
     protected static $adminUser = 'admin';
     protected static $uploadBase = '/tmp/dm-server';
 
-    protected static $exampleImage = 'cover_example.jpg';
+    public static $exampleImage = 'cover_example.jpg';
     private static $roles = ['ducksmanager' => 'ducksmanagerpass'];
 
     /** @var Application $application */
@@ -136,14 +136,15 @@ abstract class TestCommon extends WebTestCase {
     }
 
     protected static function getPathToFileToUpload($fileName) {
-        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'fixtures', $fileName]);
+        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'Fixtures', $fileName]);
     }
 
     /**
      * @param string $name
-     * @return \Doctrine\Common\Persistence\ObjectManager|object
+     * @return EntityManagerInterface
      */
-    protected function getEm($name) {
+    protected function getEm($name): EntityManagerInterface
+    {
         $kernel = static::createKernel(['environment' => 'test']);
         $kernel->boot();
         return $kernel->getContainer()->get('doctrine')->getManager($name);
@@ -169,14 +170,19 @@ abstract class TestCommon extends WebTestCase {
             ->findBy(['idUtilisateur' => $this->getUser($username)->getId()]);
     }
 
-    protected function createUserCollection($username): void
+    protected function loadFixture(string $emName, $fixture): void
     {
         $loader = new Loader();
-        $loader->addFixture(new DmCollectionFixture($username));
+        $loader->addFixture($fixture);
 
         $purger = new ORMPurger();
-        $executor = new ORMExecutor($this->getEm('dm'), $purger);
-        $executor->execute($loader->getFixtures());
+        $executor = new ORMExecutor($this->getEm($emName), $purger);
+        $executor->execute($loader->getFixtures(), true);
+    }
+
+    protected function createUserCollection($username): void
+    {
+        $this->loadFixture('dm', new DmCollectionFixture($username));
     }
 
     /**
