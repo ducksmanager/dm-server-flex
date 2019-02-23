@@ -4,7 +4,7 @@ services:
     container_name: dm-server-flex-web
     image: "nginx:1.15"
     ports:
-     - "10001:80"
+     - "10002:80"
     depends_on:
      - php
     restart: always
@@ -20,14 +20,18 @@ services:
       context: .
       dockerfile: Dockerfile-dev
     volumes:
-     - .:/var/www/html:z
+     - .:/var/www/html
      - ./php.xdebug.ini:/usr/local/etc/php/php.ini:z
     environment:
       DM_SERVER_ADDRESS: "$DM_SERVER_HOST:$DM_SERVER_PORT"
     networks:
      - front-network
+     - db-network
     command: sh -c 'composer install --no-plugins --no-scripts && php-fpm'
 
 networks:
   front-network:
     driver: bridge
+  db-network:
+    external:
+      name: dmserver_db-network

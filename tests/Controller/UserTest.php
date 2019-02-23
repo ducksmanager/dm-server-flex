@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserTest extends TestCommon
 {
-    protected function getEmNameToCreate(): string
+    protected function getEmNameToCreate(): array
     {
-        return 'dm';
+        return ['dm'];
     }
 
     public function testCallServiceWithoutSystemCredentials(): void

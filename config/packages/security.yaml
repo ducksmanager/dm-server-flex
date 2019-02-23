@@ -9,12 +9,13 @@ security:
                 users:
                     ducksmanager:  { password: '%env(ROLE_PASSWORD_DUCKSMANAGER)%', roles: [ 'ROLE_COLLECTION' ] }
                     whattheduck: { password: '%env(ROLE_PASSWORD_WHATTHEDUCK)%', roles: [ 'ROLE_COLLECTION' ] }
+                    edgecreator: { password: '%env(ROLE_PASSWORD_EDGECREATOR)%', roles: [ 'ROLE_EDGECREATOR' ] }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            http_basic: true
+            http_basic: ~
 
     access_control:
         - { path: ^/rawsql, roles: ROLE_RAWSQL }

@@ -7,9 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CoaListsTest extends TestCommon
 {
-    protected function getEmNameToCreate(): string
+    protected function getEmNameToCreate(): array
     {
-        return 'coa';
+        return ['coa'];
     }
 
     public function setUp()

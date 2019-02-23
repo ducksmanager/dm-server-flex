@@ -44,6 +44,11 @@ class CoverIdTest extends TestCommon
         'type' => 'SEARCH_RESULTS'
     ];
 
+    protected function getEmNameToCreate(): array
+    {
+        return ['coa','coverid'];
+    }
+
     public function setUp()
     {
         parent::setUp();
@@ -253,10 +258,5 @@ class CoverIdTest extends TestCommon
             self::$exampleImageToUpload,
             'image/jpeg'
         );
-    }
-
-    protected function getEmNameToCreate(): string
-    {
-        return 'coverid';
     }
 }

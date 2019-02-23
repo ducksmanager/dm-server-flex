@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CollectionTest extends TestCommon
 {
-    protected function getEmNameToCreate(): string
+    protected function getEmNameToCreate(): array
     {
-        return 'dm';
+        return ['dm', 'coa'];
     }
 
     public function testAddIssue(): void

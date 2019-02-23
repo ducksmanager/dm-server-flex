@@ -10,10 +10,10 @@ use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 abstract class TestCommon extends WebTestCase {
 
@@ -31,20 +31,28 @@ abstract class TestCommon extends WebTestCase {
     protected static $uploadBase = '/tmp/dm-server';
 
     public static $exampleImage = 'cover_example.jpg';
-    private static $roles = ['ducksmanager' => 'ducksmanagerpass'];
 
     /** @var Application $application */
     protected static $application;
 
-    abstract protected function getEmNameToCreate(): string;
+    /**
+     * @return array
+     */
+    protected function getEmNameToCreate() : array  {
+        return [];
+    }
 
     protected function setUp() {
         parent::setUp();
-        $this->spinUp($this->getEmNameToCreate());
+        foreach($this->getEmNameToCreate() as $emToCreate) {
+            $this->spinUp($emToCreate);
+        }
     }
 
     protected function tearDown() {
-        self::runCommand("doctrine:database:drop --connection={$this->getEmNameToCreate()}");
+        foreach($this->getEmNameToCreate() as $emToDrop) {
+            self::runCommand("doctrine:database:drop --force --connection=$emToDrop");
+        }
         parent::tearDown();
     }
 
@@ -64,8 +72,12 @@ abstract class TestCommon extends WebTestCase {
 
     protected static function getSystemCredentialsNoVersion($appUser): array
     {
+        $rolePassword = $_ENV['ROLE_PASSWORD_'.strtoupper($appUser)];
         return [
-            'HTTP_AUTHORIZATION' => 'Basic '.base64_encode(implode(':', [$appUser, self::$roles[$appUser]]))
+            'HTTP_AUTHORIZATION' => 'Basic '.base64_encode(implode(':', [
+                $appUser,
+                $rolePassword
+            ]))
         ];
     }
 
@@ -145,9 +157,7 @@ abstract class TestCommon extends WebTestCase {
      */
     protected function getEm($name): EntityManagerInterface
     {
-        $kernel = static::createKernel(['environment' => 'test']);
-        $kernel->boot();
-        return $kernel->getContainer()->get('doctrine')->getManager($name);
+        return self::$client->getKernel()->getContainer()->get('doctrine')->getManager($name);
     }
 
     /**
@@ -170,6 +180,10 @@ abstract class TestCommon extends WebTestCase {
             ->findBy(['idUtilisateur' => $this->getUser($username)->getId()]);
     }
 
+    /**
+     * @param string $emName
+     * @param $fixture
+     */
     protected function loadFixture(string $emName, $fixture): void
     {
         $loader = new Loader();
