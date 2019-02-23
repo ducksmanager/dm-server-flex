@@ -18,10 +18,10 @@ class CoverIdFixture implements FixtureInterface
         $this->url = $url;
     }
 
-    public function load(ObjectManager $coverIdEntityManager) : void
+    public function load(ObjectManager $dmEntityManager) : void
     {
         $cover = new Covers();
-        $coverIdEntityManager->persist(
+        $dmEntityManager->persist(
             $cover
                 ->setSitecode('webusers')
                 ->setIssuecode($this->issueCode)
@@ -32,7 +32,7 @@ class CoverIdFixture implements FixtureInterface
         $imagePath = self::getPathToFileToUpload(TestCommon::$exampleImage);
         copy($imagePath, $_ENV['IMAGE_REMOTE_ROOT'] . $this->url);
 
-        $coverIdEntityManager->flush();
+        $dmEntityManager->flush();
     }
 
     private static function getPathToFileToUpload($fileName) {

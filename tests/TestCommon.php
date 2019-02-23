@@ -94,11 +94,8 @@ abstract class TestCommon extends WebTestCase {
         $path, $userCredentials = [], $parameters = [], $systemCredentials = [], $method = 'POST', $files = []
     ): TestServiceCallCommon
     {
-        if (null === self::$application) {
-            self::$client = static::createClient();
-            self::$client->disableReboot();
-        }
-        $service = new TestServiceCallCommon(self::$client);
+        self::getClient()->disableReboot();
+        $service = new TestServiceCallCommon(self::getClient());
         $service->setPath($path);
         $service->setUserCredentials($userCredentials);
         $service->setParameters($parameters);
@@ -135,12 +132,18 @@ abstract class TestCommon extends WebTestCase {
         return null;
     }
 
+    private static function getClient() {
+        if (!isset(self::$client)) {
+            self::$client = static::createClient();
+        }
+        return self::$client;
+    }
+
     protected static function getApplication(): Application
     {
         if (null === self::$application) {
-            self::$client = static::createClient();
 
-            self::$application = new Application(self::$client->getKernel());
+            self::$application = new Application(self::getClient()->getKernel());
             self::$application->setAutoExit(false);
         }
 
@@ -157,7 +160,7 @@ abstract class TestCommon extends WebTestCase {
      */
     protected function getEm($name): EntityManagerInterface
     {
-        return self::$client->getKernel()->getContainer()->get('doctrine')->getManager($name);
+        return self::getClient()->getKernel()->getContainer()->get('doctrine')->getManager($name);
     }
 
     /**
