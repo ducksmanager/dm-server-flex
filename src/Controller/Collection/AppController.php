@@ -24,7 +24,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 {
     /**
      * @Route(methods={"GET"}, path="/collection/issues")
-     * @return JsonResponse
      */
     public function getIssues(): JsonResponse
     {
@@ -80,14 +79,12 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/collection/issues")
-     * @param Request $request
-     * @return JsonResponse
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function postIssues(Request $request): ?JsonResponse
+    public function postIssues(Request $request): JsonResponse
     {
         $country = $request->request->get('country');
         $publication = $request->request->get('publication');
@@ -119,13 +116,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/collection/purchases/{purchaseId}")
-     * @param Request $request
-     * @param string $purchaseId
-     * @return JsonResponse
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function postPurchase(Request $request, $purchaseId): ?Response
+    public function postPurchase(Request $request, ?string $purchaseId): ?Response
     {
         /** @var EntityManager $dmEm */
         $dmEm = $this->container->get('doctrine')->getManager('dm');
@@ -156,8 +150,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/collection/bookcase/sort")
-     * @param Request $request
-     * @return JsonResponse
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -191,8 +183,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/collection/inducks/import/init")
-     * @param Request $request
-     * @return JsonResponse
      */
     public function importFromInducksInit(Request $request): Response
     {
@@ -240,8 +230,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/collection/inducks/import")
-     * @param Request $request
-     * @return JsonResponse
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
@@ -276,12 +264,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         ]);
     }
 
-    /**
-     * @param array $issues
-     * @param int   $userId
-     * @return array
-     */
-    private function getNonPossessedIssues($issues, $userId): array
+    private function getNonPossessedIssues(array $issues, int $userId): array
     {
         /** @var EntityManager $dmEm */
         $dmEm = $this->container->get('doctrine')->getManager('dm');
@@ -297,13 +280,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         }));
     }
 
-    /**
-     * @param string $country
-     * @param string $publication
-     * @param string[] $issueNumbers
-     * @return int
-     */
-    private function deleteIssues($country, $publication, $issueNumbers): int
+    private function deleteIssues(string $country, string $publication, array $issueNumbers): int
     {
         /** @var EntityManager $dmEm */
         $dmEm = $this->container->get('doctrine')->getManager('dm');
@@ -327,19 +304,12 @@ class AppController extends AbstractController implements RequiresDmVersionContr
     }
 
     /**
-     * @param string $country
-     * @param string $publication
-     * @param string[] $issuenumbers
-     * @param string $condition
-     * @param bool $istosell
-     * @param int $purchaseid
-     * @return array
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    private function addOrChangeIssues($country, $publication, $issuenumbers, $condition, $istosell, $purchaseid): array
+    private function addOrChangeIssues(string $country, string $publication, array $issuenumbers, ?string $condition, ?bool $istosell, ?int $purchaseid): array
     {
         $conditionNewIssues = is_null($condition) ? 'possede' : $condition;
         $istosellNewIssues = is_null($istosell) ? false : $istosell;

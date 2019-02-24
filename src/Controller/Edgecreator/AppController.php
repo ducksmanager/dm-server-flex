@@ -35,12 +35,8 @@ class AppController extends AbstractController implements RequiresDmVersionContr
      *     methods={"PUT"},
      *     path="/edgecreator/step/{publicationCode}/{stepNumber}",
      *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"})
-     * @param Request $request
-     * @param $publicationCode
-     * @param $stepNumber
-     * @return JsonResponse
      */
-    public function addStep (Request $request, $publicationCode, $stepNumber): JsonResponse
+    public function addStep (Request $request, string $publicationCode, string $stepNumber): JsonResponse
     {
         $functionName = $request->request->get('functionname');
         $optionName = $request->request->get('optionname');
@@ -57,7 +53,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/v2/model")
-     * @return JsonResponse
      */
     public function getV2MyModels(): JsonResponse
     {
@@ -82,10 +77,8 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/v2/model/{modelId}")
-     * @param $modelId
-     * @return JsonResponse
      */
-    public function getModel($modelId): JsonResponse
+    public function getModel(int $modelId): JsonResponse
     {
         return new JsonResponseFromObject(
             $this->getEm('edgecreator')->getRepository(TranchesEnCoursModeles::class)->find($modelId)
@@ -94,7 +87,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/v2/model/editedbyother/all")
-     * @return JsonResponse
      */
     public function getModelsEditedByOthers(): JsonResponse
     {
@@ -117,7 +109,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/v2/model/unassigned/all")
-     * @return JsonResponse
      */
     public function getUnassignedModels(): JsonResponse
     {
@@ -133,11 +124,8 @@ class AppController extends AbstractController implements RequiresDmVersionContr
      *     methods={"GET"},
      *     path="/edgecreator/v2/model/{publicationCode}/{issueNumber}",
      *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"})
-     * @param $publicationCode
-     * @param $issueNumber
-     * @return Response
      */
-    public function getV2Model($publicationCode, $issueNumber): Response
+    public function getV2Model(string $publicationCode, string $issueNumber): Response
     {
         [$country, $magazine] = explode('/', $publicationCode);
         $model = $this->getEm('edgecreator')->getRepository(TranchesEnCoursModeles::class)->findOneBy([
@@ -157,14 +145,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
      *     methods={"PUT"},
      *     path="/edgecreator/v2/model/{publicationCode}/{issueNumber}/{isEditor}",
      *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"})
-     * @param $publicationCode
-     * @param $issueNumber
-     * @param $isEditor
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function createModel($publicationCode, $issueNumber, $isEditor): Response
+    public function createModel(string $publicationCode, string $issueNumber, string $isEditor): Response
     {
         $ecEm = $this->getEm('edgecreator');
         [$country, $publication] = explode('/', $publicationCode);
@@ -188,15 +172,11 @@ class AppController extends AbstractController implements RequiresDmVersionContr
      *     methods={"POST"},
      *     path="/edgecreator/v2/model/clone/to/{publicationCode}/{issueNumber}",
      *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"})
-     * @param Request $request
-     * @param $publicationCode
-     * @param $issueNumber
-     * @return Response
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function cloneSteps(Request $request, $publicationCode, $issueNumber): Response
+    public function cloneSteps(Request $request, string $publicationCode, string $issueNumber): Response
     {
         /** @var string[] $steps */
         $steps = $request->request->get('steps');
@@ -225,7 +205,11 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         $valueIds = [];
         /** @var array $stepOptions */
         foreach($steps as $stepNumber => $stepOptions) {
-            $valueIds[$stepNumber] = $this->createStepV2($targetModelId, $stepNumber, $stepOptions['options'], $stepOptions['stepfunctionname']);
+            try {
+                $this->checkStepOptions($stepOptions['options'], $stepNumber);
+                $valueIds[$stepNumber] = $this->createStepV2($targetModelId, $stepNumber, $stepOptions['options'], $stepOptions['stepfunctionname']);
+            }
+            catch(InvalidArgumentException $e) {}
         }
         return new JsonResponse([
             'modelid' => $targetModelId,
@@ -236,38 +220,29 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/edgecreator/v2/step/{modelId}/{stepNumber}")
-     * @param Request $request
-     * @param $modelId
-     * @param $stepNumber
-     * @return Response
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function createOrUpdateStep(Request $request, $modelId, $stepNumber): Response
+    public function createOrUpdateStep(Request $request, int $modelId, int $stepNumber): Response
     {
         $stepFunctionName = $request->request->get('stepfunctionname');
         $optionValues = $request->request->get('options');
 
+        $this->checkStepOptions($optionValues, $stepNumber);
         $valueIds = $this->createStepV2($modelId, $stepNumber, $optionValues, $stepFunctionName);
         return new JsonResponse(['valueids' => $valueIds]);
     }
 
     /**
      * @Route(methods={"POST"}, path="/edgecreator/v2/step/shift/{modelId}/{stepNumber}/{isIncludingThisStep}")
-     * @param $modelId
-     * @param $stepNumber
-     * @param $isIncludingThisStep
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function shiftStep($modelId, $stepNumber, $isIncludingThisStep): Response
+    public function shiftStep(int $modelId, int $stepNumber, string $isIncludingThisStep): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $model = $ecEm->getRepository(TranchesEnCoursModeles::class)->find($modelId);
-
-        $stepNumber = (int) $stepNumber;
 
         $criteria = new Criteria();
         $criteria
@@ -298,14 +273,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/edgecreator/v2/step/clone/{modelId}/{stepNumber}/to/{newStepNumber}")
-     * @param $modelId
-     * @param $stepNumber
-     * @param $newStepNumber
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function cloneStep($modelId, $stepNumber, $newStepNumber): Response
+    public function cloneStep(int $modelId, int $stepNumber, int $newStepNumber): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $criteria = [
@@ -328,7 +299,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
             $newValue->setNomFonction($value->getNomFonction());
             $newValue->setOptionNom($value->getOptionNom());
             $newValue->setOptionValeur($value->getOptionValeur());
-            $newValue->setOrdre((int)$newStepNumber);
+            $newValue->setOrdre($newStepNumber);
             $ecEm->persist($newValue);
 
             return [['old' => $oldStepNumber, 'new' => $newValue->getOrdre()]];
@@ -343,13 +314,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"DELETE"}, path="/edgecreator/v2/step/{modelId}/{stepNumber}")
-     * @param $modelId
-     * @param $stepNumber
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function deleteStep($modelId, $stepNumber): Response
+    public function deleteStep(int $modelId, int $stepNumber): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $qb = $ecEm->createQueryBuilder();
@@ -368,8 +336,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"PUT"}, path="/edgecreator/myfontspreview")
-     * @param Request $request
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -393,12 +359,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"DELETE"}, path="/edgecreator/myfontspreview/{previewId}")
-     * @param $previewId
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function deleteMyFontsPreview($previewId): Response
+    public function deleteMyFontsPreview(int $previewId): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $preview = $ecEm->getRepository(ImagesMyfonts::class)->find($previewId);
@@ -410,12 +374,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/edgecreator/model/v2/{modelId}/deactivate")
-     * @param $modelId
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function deactivateModel($modelId): Response
+    public function deactivateModel(int $modelId): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $model = $ecEm->getRepository(TranchesEnCoursModeles::class)->find($modelId);
@@ -428,14 +390,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"POST"}, path="/edgecreator/model/v2/{modelId}/readytopublish/{isReadyToPublish}")
-     * @param Request $request
-     * @param $modelId
-     * @param $isReadyToPublish
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function setModelAsReadyToBePublished(Request $request, $modelId, $isReadyToPublish): Response
+    public function setModelAsReadyToBePublished(Request $request, int $modelId, string $isReadyToPublish): Response
     {
         $dmEm = $this->getEm('dm');
         $ecEm = $this->getEm('edgecreator');
@@ -507,13 +465,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"PUT"}, path="/edgecreator/model/v2/{modelId}/photo/main")
-     * @param Request $request
-     * @param $modelId
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function setModelMainPhoto(Request $request, $modelId): Response
+    public function setModelMainPhoto(Request $request, int $modelId): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $photoName = $request->request->get('photoname');
@@ -549,7 +504,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         $ecEm->persist($mainPhoto);
 
 
-        $qbDeletePreviousPhoto = $ecEm->getRepository(TranchesEnCoursModelesImages::class)->createQueryBuilder($modelId);
+        $qbDeletePreviousPhoto = $ecEm->createQueryBuilder();
         $qbDeletePreviousPhoto
             ->delete(TranchesEnCoursModelesImages::class, 'models_photos')
             ->where('models_photos.idModele = :modelid')
@@ -570,11 +525,9 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/model/v2/{modelId}/photo/main")
-     * @param $modelId
-     * @return Response
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getModelMainPhoto($modelId): Response
+    public function getModelMainPhoto(int $modelId): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $qb = $ecEm->createQueryBuilder();
@@ -599,7 +552,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/multiple_edge_photo/today")
-     * @return Response
      * @throws \Exception
      */
     public function getMultipleEdgePhotosFromToday(): Response
@@ -621,10 +573,8 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/multiple_edge_photo/hash/{hash}")
-     * @param $hash
-     * @return Response
      */
-    public function getMultipleEdgePhotoFromHash($hash): Response
+    public function getMultipleEdgePhotoFromHash(string $hash): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $uploadedFile = $ecEm->getRepository(ImagesTranches::class)->findOneBy([
@@ -636,9 +586,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"PUT"}, path="/edgecreator/multiple_edge_photo")
-     * @param Request $request
-     * @param Swift_Mailer $mailer
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -674,11 +621,9 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     /**
      * @Route(methods={"GET"}, path="/edgecreator/elements/images/{nameSubString}")
-     * @param $nameSubString
-     * @return Response
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function getElementImagesByNameSubstring($nameSubString): Response
+    public function getElementImagesByNameSubstring(string $nameSubString): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $templatedValues = $ecEm->getConnection()->executeQuery('
@@ -719,7 +664,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         return new JsonResponseFromObject(array_values($matches));
     }
 
-    private function createStepV1(string $publicationCode, string $stepNumber, string $functionName, string $optionName): int
+    private function createStepV1(string $publicationCode, int $stepNumber, string $functionName, string $optionName): int
     {
         $ecEm = $this->container->get('doctrine')->getManager('edgecreator');
 
@@ -728,7 +673,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         $model = new EdgecreatorModeles2();
         $model->setPays($country);
         $model->setMagazine($publication);
-        $model->setOrdre((int) $stepNumber);
+        $model->setOrdre($stepNumber);
         $model->setNomFonction($functionName);
         $model->setOptionNom($optionName);
 
@@ -738,7 +683,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         return $model->getId();
     }
 
-    private function createValueV1(string $optionId, string $optionValue) {
+    private function createValueV1(string $optionId, string $optionValue) : int {
         $ecEm = $this->container->get('doctrine')->getManager('edgecreator');
 
         $value = new EdgecreatorValeurs();
@@ -751,7 +696,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         return $value->getId();
     }
 
-    private function createIntervalV1(string $valueId, string $firstIssueNumber, string $lastIssueNumber) {
+    private function createIntervalV1(int $valueId, string $firstIssueNumber, string $lastIssueNumber) : int {
         $ecEm = $this->container->get('doctrine')->getManager('edgecreator');
         $interval = new EdgecreatorIntervalles();
 
@@ -766,7 +711,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         return $interval->getId();
     }
     
-    private function deleteSteps($modelId) {
+    private function deleteSteps(int $modelId) : int {
         $qbDeleteSteps = $this->getEm('edgecreator')->createQueryBuilder();
         $qbDeleteSteps
             ->delete(TranchesEnCoursValeurs::class, 'values')
@@ -777,12 +722,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
     }
 
     /**
-     * @param $modelId
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function assignModel($modelId): Response
+    private function assignModel(int $modelId): Response
     {
         $ecEm = $this->getEm('edgecreator');
         $model = $ecEm->getRepository(TranchesEnCoursModeles::class)->find($modelId);
@@ -795,29 +738,17 @@ class AppController extends AbstractController implements RequiresDmVersionContr
     }
 
     /**
-     * @param integer $modelId
-     * @param integer $stepNumber
-     * @param array $options
-     * @param string $newFunctionName
-     * @return array
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function createStepV2($modelId, $stepNumber, $options, $newFunctionName): array
+    public function createStepV2(int $modelId, int $stepNumber, $options, ?string $newFunctionName): array
     {
         $ecEm = $this->getEm('edgecreator');
         $qb = $ecEm->createQueryBuilder();
 
         /** @var TranchesEnCoursModeles $model */
         $model = $ecEm->getRepository(TranchesEnCoursModeles::class)->find($modelId);
-
-        if (is_null($options)) {
-            throw new InvalidArgumentException('No options provided, ignoring step '.$stepNumber);
-        }
-        if (!is_array($options)) {
-            throw new InvalidArgumentException('Invalid options input : '.print_r($options, true));
-        }
 
         if (is_null($newFunctionName)) {
             /** @var ?TranchesEnCoursValeurs $existingValue */
@@ -848,7 +779,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         array_walk($options, function($optionValue, $optionName) use ($ecEm, $model, $stepNumber, $newFunctionName, &$createdOptions) {
             $optionToCreate = new TranchesEnCoursValeurs();
             $optionToCreate->setIdModele($model);
-            $optionToCreate->setOrdre((int)$stepNumber);
+            $optionToCreate->setOrdre($stepNumber);
             $optionToCreate->setNomFonction($newFunctionName);
             $optionToCreate->setOptionNom($optionName);
             $optionToCreate->setOptionValeur($optionValue);
@@ -861,5 +792,14 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         $ecEm->clear();
 
         return $createdOptions;
+    }
+
+    private function checkStepOptions($options, int $stepNumber) : void {
+        if (is_null($options)) {
+            throw new InvalidArgumentException('No options provided, ignoring step '.$stepNumber);
+        }
+        if (!is_array($options)) {
+            throw new InvalidArgumentException('Invalid options input : '.print_r($options, true));
+        }
     }
 }

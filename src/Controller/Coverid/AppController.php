@@ -8,7 +8,6 @@ use App\Models\Coverid\Covers;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Func;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,11 +22,9 @@ class AppController extends AbstractController
 
     /**
      * @Route(methods={"GET"}, path="/cover-id/download/{coverId}")
-     * @param integer $coverId
-     * @return Response|BinaryFileResponse
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function downloadCover($coverId) {
+    public function downloadCover(int $coverId) : Response {
         /** @var EntityManager $coverEm */
         $coverEm = $this->container->get('doctrine')->getManager('coverid');
         $qb = $coverEm->createQueryBuilder();
@@ -80,8 +77,6 @@ class AppController extends AbstractController
 
     /**
      * @Route(methods={"POST"}, path="/cover-id/search")
-     * @param Request $request
-     * @param LoggerInterface $logger
      * @return Response
      */
     public function searchCover(Request $request, LoggerInterface $logger): Response
@@ -149,20 +144,14 @@ class AppController extends AbstractController
 
     /**
      * @Route(methods={"GET"}, path="/cover-id/issuecodes/{coverIds}")
-     * @param string $coverIds
-     * @return Response
      */
-    public function getCoverList($coverIds): Response
+    public function getCoverList(string $coverIds): Response
     {
         return new JsonResponse(
             $this->getIssuesCodesFromCoverIds(explode(',', $coverIds))
         );
     }
 
-    /**
-     * @param array $coverIds
-     * @return array
-     */
     private function getIssuesCodesFromCoverIds(array $coverIds): array
     {
         /** @var EntityManager $coverEm */

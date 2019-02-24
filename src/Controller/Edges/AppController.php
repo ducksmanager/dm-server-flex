@@ -18,9 +18,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
      *     methods={"GET"},
      *     path="/edges/{publicationCode}/{issueNumbers}",
      *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"})
-     * @param string $publicationCode
-     * @param string $issueNumbers
-     * @return JsonResponse
      */
     public function getEdges(string $publicationCode, string $issueNumbers) : JsonResponse
     {
@@ -42,9 +39,6 @@ class AppController extends AbstractController implements RequiresDmVersionContr
      *     methods={"GET"},
      *     path="/edges/references/{publicationCode}/{issueNumbers}",
      *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"})
-     * @param string $publicationCode
-     * @param string $issueNumbers
-     * @return JsonResponse
      */
     public function getEdgeReferences(string $publicationCode, string $issueNumbers): JsonResponse
     {

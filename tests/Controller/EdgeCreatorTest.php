@@ -245,8 +245,8 @@ class EdgeCreatorTest extends TestCommon
 
         $this->assertUnsuccessfulResponse($response, function(Response $response) {
             $this->assertEquals('No values to clone for '.json_encode([
-                'idModele' => '1',
-                'ordre' => '3'
+                'idModele' => 1,
+                'ordre' => 3
             ]), $response->getContent());
         });
     }
@@ -273,6 +273,7 @@ class EdgeCreatorTest extends TestCommon
         $model = $this->getV2Model('fr', 'PM', '502');
 
         $response = $this->buildAuthenticatedServiceWithTestUser("/edgecreator/v2/step/{$model->getId()}/3", self::$edgecreatorUser, 'POST', [
+            'stepfunctionname' => 'Remplir',
             'options' => '2'
         ])->call();
 
@@ -286,6 +287,7 @@ class EdgeCreatorTest extends TestCommon
         $model = $this->getV2Model('fr', 'PM', '502');
 
         $response = $this->buildAuthenticatedServiceWithTestUser("/edgecreator/v2/step/{$model->getId()}/3", self::$edgecreatorUser, 'POST', [
+            'stepfunctionname' => 'Remplir',
             'options!!!' => []
         ])->call();
 
@@ -299,6 +301,7 @@ class EdgeCreatorTest extends TestCommon
         $model = $this->getV2Model('fr', 'PM', '502');
 
         $response = $this->buildAuthenticatedServiceWithTestUser("/edgecreator/v2/step/{$model->getId()}/1", self::$edgecreatorUser, 'POST', [
+            'stepfunctionname' => 'Remplir',
             'options' => [
                 'Couleur' => '#DDDDDD',
                 'Pos_x' => '1',

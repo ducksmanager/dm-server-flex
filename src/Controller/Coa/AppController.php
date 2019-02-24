@@ -18,11 +18,8 @@ class AppController extends AbstractController
 {
     /**
      * @Route(methods={"GET"}, path="/coa/list/countries/{locale}/{countryCodes}", defaults={"countryCodes"=""}))
-     * @param string $locale
-     * @param string $countryCodes
-     * @return Response
      */
-    public function listCountriesFromCodes($locale, $countryCodes): Response
+    public function listCountriesFromCodes(string $locale, ?string $countryCodes): Response
     {
         $coaEm = $this->getEm('coa');
         $qb = $coaEm->createQueryBuilder();
@@ -58,10 +55,8 @@ class AppController extends AbstractController
      *     path="/coa/list/publications/{publicationCodes}",
      *     requirements={"publicationCodes"="^([a-z]+|((?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+),){0,9}[a-z]+/[-A-Z0-9]+)$"}
      * )
-     * @param string $publicationCodes
-     * @return Response
      */
-    public function listPublicationsFromPublicationCodes($publicationCodes): Response
+    public function listPublicationsFromPublicationCodes(string $publicationCodes): Response
     {
         $coaEm = $this->getEm('coa');
         $qb = $coaEm->createQueryBuilder();
@@ -93,10 +88,8 @@ class AppController extends AbstractController
      *     path="/coa/list/issues/{publicationCode}",
      *     requirements={"publicationCode"="^(?P<publicationcode_regex>[a-z]+/[-A-Z0-9]+)$"}
      * )
-     * @param string $publicationCode
-     * @return Response
      */
-    public function listIssuesFromPublicationCode($publicationCode): Response
+    public function listIssuesFromPublicationCode(string $publicationCode): Response
     {
         $coaEm = $this->getEm('coa');
         $qb = $coaEm->createQueryBuilder();
@@ -123,11 +116,8 @@ class AppController extends AbstractController
      *     path="/coa/list/issuesbycodes/{issueCodes}",
      *     requirements={"issueCodes"="^((?P<issuecode_regex>[a-z]+/[-A-Z0-9 ]+),){0,3}[a-z]+/[-A-Z0-9 ]+$"}
      * )
-     * @param string $issueCodes
-     * @param LoggerInterface $logger
-     * @return Response
      */
-    public function listIssuesFromIssueCodes($issueCodes, LoggerInterface $logger): Response
+    public function listIssuesFromIssueCodes(string $issueCodes, LoggerInterface $logger): Response
     {
         $coaEm = $this->getEm('coa');
         $issuecodesList = explode(',', $issueCodes);

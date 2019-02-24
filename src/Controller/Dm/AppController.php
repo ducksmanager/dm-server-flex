@@ -12,8 +12,6 @@ class AppController extends AbstractController// implements RequiresDmUserContro
 {
     /**
      * @Route(methods={"POST"}, path="/ducksmanager/user/new")
-     * @param Request $request
-     * @return Response
      */
     public function createUser(Request $request): Response {
         $check = $this->checkNewUser(
@@ -37,7 +35,7 @@ class AppController extends AbstractController// implements RequiresDmUserContro
         return new Response('KO', Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
-    private function checkNewUser($username, $password, $password2)
+    private function checkNewUser(?string $username, string $password, string $password2)
     {
         if (isset($username)) {
             if (strlen($username) <3) {
@@ -56,7 +54,7 @@ class AppController extends AbstractController// implements RequiresDmUserContro
         return true;
     }
 
-    private function usernameExists($username): bool
+    private function usernameExists(string $username): bool
     {
         /** @var EntityManager $dmEm */
         $dmEm = $this->container->get('doctrine')->getManager('dm');
@@ -66,7 +64,11 @@ class AppController extends AbstractController// implements RequiresDmUserContro
         return count($existingUser) > 0;
     }
 
-    private function createUserNoCheck($username, $password, $email): bool
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function createUserNoCheck(string $username, string $password, string $email): bool
     {
         /** @var EntityManager $dmEm */
         $dmEm = $this->container->get('doctrine')->getManager('dm');
