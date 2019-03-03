@@ -6,7 +6,9 @@ use App\Controller\AbstractController;
 use App\EntityTransform\SimpleIssueWithCoverId;
 use App\Models\Coa\InducksCountryname;
 use App\Models\Coa\InducksIssue;
+use App\Models\Coa\InducksPerson;
 use App\Models\Coa\InducksPublication;
+use App\Models\Coa\InducksStory;
 use App\Models\Coverid\Covers;
 use Doctrine\ORM\Query\Expr\Join;
 use Psr\Log\LoggerInterface;
@@ -109,7 +111,6 @@ class AppController extends AbstractController
         return new JsonResponse($issueNumbers);
     }
 
-
     /**
      * @Route(
      *     methods={"GET"},
@@ -167,5 +168,56 @@ class AppController extends AbstractController
         );
 
         return new JsonResponse(self::getSimpleArray($issues));
+    }
+
+    /**
+     * @Route(methods={"GET"}, path="/coa/authorsfullnames/{authors}")
+     */
+    public function listAuthorsFromAuthorCodes(string $authors): JsonResponse
+    {
+        $authorsList = array_unique(explode(',', $authors));
+
+        $qbAuthorsFullNames = $this->getEm('coa')->createQueryBuilder();
+        $qbAuthorsFullNames
+            ->select('p.personcode, p.fullname')
+            ->from(InducksPerson::class, 'p')
+            ->where($qbAuthorsFullNames->expr()->in('p.personcode', $authorsList));
+
+        $fullNamesResults = $qbAuthorsFullNames->getQuery()->getResult();
+
+        $fullNames = [];
+        array_walk($fullNamesResults, function($authorFullName) use (&$fullNames) {
+            $fullNames[$authorFullName['personcode']] = $authorFullName['fullname'];
+        });
+        return new JsonResponse($fullNames);
+    }
+
+    /**
+     * @Route(
+     *     methods={"GET"},
+     *     path="/coa/storydetails/{storyCodes}",
+     *     requirements={"storyCodes"="^((?P<storycode_regex>[-/A-Za-z0-9 ?&]+),){0,49}[-/A-Za-z0-9 ?&]+$"}
+     * )
+     */
+    public function listStoryDetailsFromStoryCodes(string $storyCodes): JsonResponse
+    {
+        $storyList = array_unique(explode(',', $storyCodes));
+
+        $qbStoryDetails = $this->getEm('coa')->createQueryBuilder();
+        $qbStoryDetails
+            ->select('story.storycode, story.title, story.storycomment')
+            ->from(InducksStory::class, 'story')
+            ->where($qbStoryDetails->expr()->in('story.storycode', $storyList));
+
+        $storyDetailsResults = $qbStoryDetails->getQuery()->getResult();
+
+        $storyDetails = [];
+        array_walk($storyDetailsResults, function($story) use (&$storyDetails) {
+            $storyDetails[$story['storycode']] = [
+                'storycomment' => $story['storycomment'],
+                'title' => $story['title']
+            ];
+        });
+        return new JsonResponse($storyDetails);
     }
 }

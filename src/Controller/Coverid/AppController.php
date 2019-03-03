@@ -133,7 +133,7 @@ class AppController extends AbstractController
             )
         );
 
-        $issues = $this->callInternal(\App\Controller\Coa\AppController::class, 'listIssuesFromIssueCodes', compact('issueCodes'))->getContent();
+        $issues = $this->callService(\App\Controller\Coa\AppController::class, 'listIssuesFromIssueCodes', compact('issueCodes'))->getContent();
         $logger->info('Cover ID search: matched ' . count($coverInfos) . ' issues');
 
         return new JsonResponse([

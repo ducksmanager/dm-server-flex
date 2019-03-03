@@ -1,13 +1,12 @@
 <?php
-namespace DmServer\Test;
+namespace App\Tests;
 
 use App\Tests\Fixtures\DmCollectionFixture;
-use App\Tests\TestCommon;
 use Symfony\Component\HttpFoundation\Response;
 
 class RawSqlTest extends TestCommon
 {
-    protected function getEmNameToCreate(): array
+    protected function getEmNamesToCreate(): array
     {
         return ['dm'];
     }

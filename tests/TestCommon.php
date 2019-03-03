@@ -38,13 +38,13 @@ abstract class TestCommon extends WebTestCase {
     /**
      * @return array
      */
-    protected function getEmNameToCreate() : array  {
+    protected function getEmNamesToCreate() : array  {
         return [];
     }
 
     protected function setUp() {
         parent::setUp();
-        foreach($this->getEmNameToCreate() as $emToCreate) {
+        foreach($this->getEmNamesToCreate() as $emToCreate) {
             $this->spinUp($emToCreate);
         }
     }

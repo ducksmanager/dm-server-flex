@@ -44,7 +44,7 @@ class CoverIdTest extends TestCommon
         'type' => 'SEARCH_RESULTS'
     ];
 
-    protected function getEmNameToCreate(): array
+    protected function getEmNamesToCreate(): array
     {
         return ['coa','coverid'];
     }

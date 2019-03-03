@@ -1,11 +1,10 @@
 <?php
-namespace DmServer\Test;
+namespace App\Tests;
 
 use App\Helper\SimilarImagesHelper;
 use App\Tests\Controller\CoverIdTest;
 use App\Tests\Fixtures\CoverIdFixture;
 use App\Tests\Fixtures\EdgeCreatorFixture;
-use App\Tests\TestCommon;
 use Symfony\Component\HttpFoundation\Response;
 
 class StatusTest extends TestCommon

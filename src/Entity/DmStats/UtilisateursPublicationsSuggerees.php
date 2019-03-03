@@ -7,17 +7,24 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * UtilisateursPublicationsSuggerees
  *
- * @ORM\Table(name="utilisateurs_publications_suggerees", indexes={@ORM\Index(name="user", columns={"ID_User"})})
+ * @ORM\Table(name="utilisateurs_publications_suggerees", uniqueConstraints={@ORM\UniqueConstraint(name="suggested_issue_for_user", columns={"ID_User", "publicationcode", "issuenumber"})}, indexes={@ORM\Index(name="suggested_issue_user", columns={"ID_User"})})
  * @ORM\Entity
  */
 class UtilisateursPublicationsSuggerees
 {
     /**
+     * @var int
+     *
+     * @ORM\Column(name="ID", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="publicationcode", type="string", length=12, nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $publicationcode;
 
@@ -25,8 +32,6 @@ class UtilisateursPublicationsSuggerees
      * @var string
      *
      * @ORM\Column(name="issuenumber", type="string", length=12, nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $issuenumber;
 
@@ -38,25 +43,39 @@ class UtilisateursPublicationsSuggerees
     private $score;
 
     /**
-     * @var \AuteursPseudos
+     * @var integer
      *
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
-     * @ORM\OneToOne(targetEntity="AuteursPseudos")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="ID_User", referencedColumnName="ID_User")
-     * })
+     * @ORM\Column(name="ID_User", type="integer", nullable=false)
      */
     private $idUser;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function getPublicationcode(): ?string
     {
         return $this->publicationcode;
     }
 
+    public function setPublicationcode(string $publicationcode): self
+    {
+        $this->publicationcode = $publicationcode;
+
+        return $this;
+    }
+
     public function getIssuenumber(): ?string
     {
         return $this->issuenumber;
+    }
+
+    public function setIssuenumber(string $issuenumber): self
+    {
+        $this->issuenumber = $issuenumber;
+
+        return $this;
     }
 
     public function getScore(): ?int
@@ -71,12 +90,12 @@ class UtilisateursPublicationsSuggerees
         return $this;
     }
 
-    public function getIdUser(): ?AuteursPseudos
+    public function getIdUser(): ?int
     {
         return $this->idUser;
     }
 
-    public function setIdUser(?AuteursPseudos $idUser): self
+    public function setIdUser(?int $idUser): self
     {
         $this->idUser = $idUser;
 

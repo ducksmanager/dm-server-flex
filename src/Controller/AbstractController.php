@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
 {
-    protected function callInternal(string $class, string $function, array $parameters): Response
+    protected function callService(string $class, string $function, array $parameters): Response
     {
         return $this->forward($class.'::'.$function, $parameters);
     }

@@ -31,9 +31,9 @@ class AuteursPseudos
     private $idUser;
 
     /**
-     * @var bool
+     * @var int
      *
-     * @ORM\Column(name="Notation", type="boolean", nullable=false, options={"default"="-1"})
+     * @ORM\Column(name="Notation", type="integer", nullable=false, options={"default"="-1"})
      */
     private $notation = '-1';
 
@@ -47,12 +47,12 @@ class AuteursPseudos
         return $this->idUser;
     }
 
-    public function getNotation(): ?bool
+    public function getNotation(): ?int
     {
         return $this->notation;
     }
 
-    public function setNotation(bool $notation): self
+    public function setNotation(int $notation): self
     {
         $this->notation = $notation;
 

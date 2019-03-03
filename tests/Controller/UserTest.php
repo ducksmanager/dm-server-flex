@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserTest extends TestCommon
 {
-    protected function getEmNameToCreate(): array
+    protected function getEmNamesToCreate(): array
     {
         return ['dm'];
     }

@@ -48,7 +48,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         }
 
         $countryNames = json_decode(
-            $this->callInternal(\App\Controller\Coa\AppController::class, 'listCountriesFromCodes', [
+            $this->callService(\App\Controller\Coa\AppController::class, 'listCountriesFromCodes', [
                 'locale' => 'fr', // FIXME
                 'countryCodes' => implode(',', array_unique(
                     array_map(function (Numeros $issue) {
@@ -59,7 +59,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         );
 
         $publicationTitles = json_decode(
-            $this->callInternal(\App\Controller\Coa\AppController::class, 'listPublicationsFromPublicationCodes', [
+            $this->callService(\App\Controller\Coa\AppController::class, 'listPublicationsFromPublicationCodes', [
                 'publicationCodes' => implode(',', array_unique(
                     array_map(function (Numeros $issue) {
                         return PublicationHelper::getPublicationCode($issue);

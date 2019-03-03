@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CollectionTest extends TestCommon
 {
-    protected function getEmNameToCreate(): array
+    protected function getEmNamesToCreate(): array
     {
         return ['dm', 'coa'];
     }

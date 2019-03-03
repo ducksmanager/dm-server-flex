@@ -1,5 +1,5 @@
 <?php
-namespace DmServer\Test;
+namespace App\Tests;
 
 use App\Models\EdgeCreator\EdgecreatorIntervalles;
 use App\Models\EdgeCreator\EdgecreatorModeles2;
@@ -11,7 +11,6 @@ use App\Models\EdgeCreator\TranchesEnCoursModeles;
 use App\Models\EdgeCreator\TranchesEnCoursModelesImages;
 use App\Models\EdgeCreator\TranchesEnCoursValeurs;
 use App\Tests\Fixtures\EdgeCreatorFixture;
-use App\Tests\TestCommon;
 use Countable;
 use Swift_Message;
 use Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector;
@@ -19,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EdgeCreatorTest extends TestCommon
 {
-    protected function getEmNameToCreate() : array {
+    protected function getEmNamesToCreate() : array {
         return ['dm', 'edgecreator'];
     }
 

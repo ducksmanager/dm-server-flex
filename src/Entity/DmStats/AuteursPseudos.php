@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * AuteursPseudos
  *
- * @ORM\Table(name="auteurs_pseudos", uniqueConstraints={@ORM\UniqueConstraint(name="auteurs_pseudos_ID_User_NomAuteurAbrege_uindex", columns={"ID_User", "NomAuteurAbrege"})}, indexes={@ORM\Index(name="index_auteur_inducks", columns={"NomAuteurAbrege"})})
+ * @ORM\Table(name="auteurs_pseudos", uniqueConstraints={@ORM\UniqueConstraint(name="author_user_id", columns={"ID_User", "NomAuteurAbrege"})})
  * @ORM\Entity
  */
 class AuteursPseudos
@@ -36,9 +36,9 @@ class AuteursPseudos
     private $nomauteurabrege;
 
     /**
-     * @var bool|null
+     * @var int
      *
-     * @ORM\Column(name="Notation", type="boolean", nullable=true)
+     * @ORM\Column(name="Notation", type="integer", nullable=true)
      */
     private $notation;
 
@@ -71,12 +71,12 @@ class AuteursPseudos
         return $this;
     }
 
-    public function getNotation(): ?bool
+    public function getNotation(): ?int
     {
         return $this->notation;
     }
 
-    public function setNotation(?bool $notation): self
+    public function setNotation(?int $notation): self
     {
         $this->notation = $notation;
 

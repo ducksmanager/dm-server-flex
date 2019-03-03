@@ -1,12 +1,11 @@
 <?php
-namespace DmServer\Test;
+namespace App\Tests;
 
 use App\Tests\Fixtures\EdgesFixture;
-use App\Tests\TestCommon;
 
 class EdgesTest extends TestCommon
 {
-    protected function getEmNameToCreate(): array
+    protected function getEmNamesToCreate(): array
     {
         return ['dm'];
     }
