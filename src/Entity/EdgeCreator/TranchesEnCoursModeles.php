@@ -2,6 +2,7 @@
 
 namespace App\Models\EdgeCreator;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\OneToMany;
 
@@ -77,6 +78,12 @@ class TranchesEnCoursModeles
      * @ORM\Column(name="PretePourPublication", type="boolean", nullable=false)
      */
     private $pretepourpublication;
+
+    public function __construct()
+    {
+        $this->photos = new ArrayCollection();
+        $this->contributeurs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -199,6 +206,52 @@ class TranchesEnCoursModeles
     public function setPretepourpublication(bool $pretepourpublication): self
     {
         $this->pretepourpublication = $pretepourpublication;
+
+        return $this;
+    }
+
+    public function addPhoto(TranchesEnCoursModelesImages $photo): self
+    {
+        if (!$this->photos->contains($photo)) {
+            $this->photos[] = $photo;
+            $photo->setIdModele($this);
+        }
+
+        return $this;
+    }
+
+    public function removePhoto(TranchesEnCoursModelesImages $photo): self
+    {
+        if ($this->photos->contains($photo)) {
+            $this->photos->removeElement($photo);
+            // set the owning side to null (unless already changed)
+            if ($photo->getIdModele() === $this) {
+                $photo->setIdModele(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addContributeur(TranchesEnCoursContributeurs $contributeur): self
+    {
+        if (!$this->contributeurs->contains($contributeur)) {
+            $this->contributeurs[] = $contributeur;
+            $contributeur->setIdModele($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContributeur(TranchesEnCoursContributeurs $contributeur): self
+    {
+        if ($this->contributeurs->contains($contributeur)) {
+            $this->contributeurs->removeElement($contributeur);
+            // set the owning side to null (unless already changed)
+            if ($contributeur->getIdModele() === $this) {
+                $contributeur->setIdModele(null);
+            }
+        }
 
         return $this;
     }
