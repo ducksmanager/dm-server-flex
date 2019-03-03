@@ -32,7 +32,7 @@ services:
 networks:
   db-network:
     external:
-      name: dm-server_db-network
+      name: dmserver_db-network
   front-network:
     external:
-      name: dm-server_front-network
+      name: dmserver_front-network
