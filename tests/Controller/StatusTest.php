@@ -4,6 +4,7 @@ namespace App\Tests;
 use App\Helper\SimilarImagesHelper;
 use App\Tests\Controller\CoverIdTest;
 use App\Tests\Fixtures\CoverIdFixture;
+use App\Tests\Fixtures\DmStatsFixture;
 use App\Tests\Fixtures\EdgeCreatorFixture;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -113,6 +114,7 @@ class StatusTest extends TestCommon
             $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
         }
         $this->loadFixture('edgecreator', new EdgeCreatorFixture($this->getUser('dm_test_user')));
+        $this->loadFixture('dmstats', new DmStatsFixture(1));
 
         $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
 
@@ -136,35 +138,12 @@ class StatusTest extends TestCommon
             $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
         }
         $this->loadFixture('edgecreator', new EdgeCreatorFixture($this->getUser('dm_test_user')));
+        $this->loadFixture('dmstats', new DmStatsFixture(1));
 
         $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
 
         $this->assertUnsuccessfulResponse($response, function(Response $response) {
-            $this->assertContains('Error for db_coa', $response->getContent());
+            $this->assertContains('Error for coa : received response []', $response->getContent());
         });
-    }
-
-    public function testGetDbStatusDBDown(): void {
-        $this->spinUp('dm');
-        $this->spinUp('coverid');
-        $this->spinUp('dmstats');
-        $this->spinUp('edgecreator');
-        $_ENV['DATABASE_COA_HOST'] = null;
-
-        $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
-        $this->assertUnsuccessfulResponse($response, function(Response $response) {
-            $this->assertContains('Error for db_coa : JSON cannot be decoded', $response->getContent());
-        });
-    }
-
-    public function testGetSwaggerJson(): void {
-        $response = $this->buildAuthenticatedService('/status/swagger.json', self::$dmUser, [], [], 'GET')->call();
-        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-    }
-
-    public function testGetSwaggerJsonNotExisting(): void {
-        $_ENV['SWAGGER_PATH'] = '/not/existing';
-        $response = $this->buildAuthenticatedService('/status/swagger.json', self::$dmUser, [], [], 'GET')->call();
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 }

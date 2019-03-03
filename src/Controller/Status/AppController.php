@@ -52,7 +52,6 @@ class AppController extends AbstractController
      */
     public function getDbStatus(LoggerInterface $logger): Response {
         $errors = [];
-        $log = [];
         $databaseChecks = [
             'dm' => 'SELECT * FROM users LIMIT 1',
             'coa' => self::generateRowCheckOnTables($this->getEm('coa')),
@@ -67,9 +66,10 @@ class AppController extends AbstractController
             }
         }
         if (count($errors) === 0) {
-            $log[] = 'OK for all databases';
+            return new Response('OK for all databases');
         }
-        return new Response(implode('<br />', $log));
+
+        return new Response('<br /><b>'.implode('</b><br /><b>', $errors).'</b>', Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     /**

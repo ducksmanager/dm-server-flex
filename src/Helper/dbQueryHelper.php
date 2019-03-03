@@ -42,7 +42,7 @@ trait dbQueryHelper {
             return true;
         }
 
-        $responseText = print_r($results, true);
+        $responseText = json_encode($results);
         $logger->info("DB check for $dbName failed because no data could be fetched");
         return "Error for $dbName : received response $responseText";
     }
