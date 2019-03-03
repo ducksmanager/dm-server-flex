@@ -30,7 +30,7 @@ class AppController extends AbstractController
         $qb = $coverEm->createQueryBuilder();
 
         $concatFunc = new Func('CONCAT', [
-            $qb->expr()->literal('https://outducks.org/'),
+            $qb->expr()->literal($_ENV['IMAGE_REMOTE_ROOT']),
             'covers.sitecode',
             $qb->expr()->literal('/'),
             'case covers.sitecode when \'webusers\' then \'webusers/\' else \'\' end',
