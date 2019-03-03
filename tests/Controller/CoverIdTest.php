@@ -2,8 +2,8 @@
 namespace App\Tests\Controller;
 
 
+use App\Entity\Coverid\Covers;
 use App\Helper\SimilarImagesHelper;
-use App\Models\Coverid\Covers;
 use App\Tests\Fixtures\CoaEntryFixture;
 use App\Tests\Fixtures\CoverIdFixture;
 use App\Tests\TestCommon;

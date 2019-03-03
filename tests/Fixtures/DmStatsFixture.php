@@ -2,13 +2,13 @@
 
 namespace App\Tests\Fixtures;
 
-use App\Models\Coa\InducksIssue;
-use App\Models\Coa\InducksStory;
-use App\Models\DmStats\AuteursHistoires;
-use App\Models\DmStats\AuteursPseudos;
-use App\Models\DmStats\UtilisateursHistoiresManquantes;
-use App\Models\DmStats\UtilisateursPublicationsManquantes;
-use App\Models\DmStats\UtilisateursPublicationsSuggerees;
+use App\Entity\Coa\InducksIssue;
+use App\Entity\Coa\InducksStory;
+use App\Entity\DmStats\AuteursHistoires;
+use App\Entity\DmStats\AuteursPseudos;
+use App\Entity\DmStats\UtilisateursHistoiresManquantes;
+use App\Entity\DmStats\UtilisateursPublicationsManquantes;
+use App\Entity\DmStats\UtilisateursPublicationsSuggerees;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 

@@ -19,7 +19,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
     public function runQuery(Request $request, LoggerInterface $logger): Response
     {
         $query = $request->request->get('query');
-        $db = $request->request->get('db');
+        $db = preg_replace('#^db_#', '', $request->request->get('db'));
         $log = $request->request->get('log');
         $parameters = $request->request->get('parameters') ?: [];
 

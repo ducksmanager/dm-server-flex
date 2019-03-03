@@ -2,8 +2,8 @@
 
 namespace App\Tests;
 
-use App\Models\Dm\Numeros;
-use App\Models\Dm\Users;
+use App\Entity\Dm\Numeros;
+use App\Entity\Dm\Users;
 use App\Tests\Fixtures\DmCollectionFixture;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;

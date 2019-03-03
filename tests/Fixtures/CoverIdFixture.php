@@ -2,7 +2,7 @@
 
 namespace App\Tests\Fixtures;
 
-use App\Models\Coverid\Covers;
+use App\Entity\Coverid\Covers;
 use App\Tests\TestCommon;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;

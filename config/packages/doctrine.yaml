@@ -84,7 +84,7 @@ doctrine:
                         is_bundle: false
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/Dm'
-                        prefix: 'App\Models\Dm'
+                        prefix: 'App\Entity\Dm'
                         alias: Dm
             coa:
                 connection: coa
@@ -93,7 +93,7 @@ doctrine:
                         is_bundle: false
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/Coa'
-                        prefix: 'App\Models\Coa'
+                        prefix: 'App\Entity\Coa'
                         alias: Coa
             coverid:
                 connection: coverid
@@ -102,7 +102,7 @@ doctrine:
                         is_bundle: false
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/Coverid'
-                        prefix: 'App\Models\Coverid'
+                        prefix: 'App\Entity\Coverid'
                         alias: Coverid
             dmstats:
                 connection: dmstats
@@ -111,7 +111,7 @@ doctrine:
                         is_bundle: false
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/DmStats'
-                        prefix: 'App\Models\DmStats'
+                        prefix: 'App\Entity\DmStats'
                         alias: DmStats
 
             edgecreator:
@@ -121,5 +121,5 @@ doctrine:
                         is_bundle: false
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/EdgeCreator'
-                        prefix: 'App\Models\EdgeCreator'
+                        prefix: 'App\Entity\EdgeCreator'
                         alias: EdgeCreator

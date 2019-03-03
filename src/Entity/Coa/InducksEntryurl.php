@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Coa;
+namespace App\Entity\Coa;
 
 use Doctrine\ORM\Mapping as ORM;
 

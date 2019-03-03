@@ -2,14 +2,14 @@
 
 namespace App\Tests\Fixtures;
 
-use App\Models\Coa\InducksCountryname;
-use App\Models\Coa\InducksEntry;
-use App\Models\Coa\InducksEntryurl;
-use App\Models\Coa\InducksIssue;
-use App\Models\Coa\InducksPerson;
-use App\Models\Coa\InducksPublication;
-use App\Models\Coa\InducksStory;
-use App\Models\Coa\InducksStoryversion;
+use App\Entity\Coa\InducksCountryname;
+use App\Entity\Coa\InducksEntry;
+use App\Entity\Coa\InducksEntryurl;
+use App\Entity\Coa\InducksIssue;
+use App\Entity\Coa\InducksPerson;
+use App\Entity\Coa\InducksPublication;
+use App\Entity\Coa\InducksStory;
+use App\Entity\Coa\InducksStoryversion;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\Persistence\ObjectManager;

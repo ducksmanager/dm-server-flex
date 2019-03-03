@@ -3,13 +3,13 @@
 namespace App\Controller\Coa;
 
 use App\Controller\AbstractController;
+use App\Entity\Coa\InducksCountryname;
+use App\Entity\Coa\InducksIssue;
+use App\Entity\Coa\InducksPerson;
+use App\Entity\Coa\InducksPublication;
+use App\Entity\Coa\InducksStory;
+use App\Entity\Coverid\Covers;
 use App\EntityTransform\SimpleIssueWithCoverId;
-use App\Models\Coa\InducksCountryname;
-use App\Models\Coa\InducksIssue;
-use App\Models\Coa\InducksPerson;
-use App\Models\Coa\InducksPublication;
-use App\Models\Coa\InducksStory;
-use App\Models\Coverid\Covers;
 use Doctrine\ORM\Query\Expr\Join;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;

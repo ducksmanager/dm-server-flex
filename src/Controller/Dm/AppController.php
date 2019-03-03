@@ -2,7 +2,7 @@
 namespace App\Controller\Dm;
 
 use App\Controller\AbstractController;
-use App\Models\Dm\Users;
+use App\Entity\Dm\Users;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

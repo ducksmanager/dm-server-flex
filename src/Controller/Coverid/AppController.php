@@ -3,8 +3,8 @@
 namespace App\Controller\Coverid;
 
 use App\Controller\AbstractController;
+use App\Entity\Coverid\Covers;
 use App\Helper\SimilarImagesHelper;
-use App\Models\Coverid\Covers;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Func;
 use Psr\Log\LoggerInterface;

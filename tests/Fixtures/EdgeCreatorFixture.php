@@ -2,15 +2,15 @@
 
 namespace App\Tests\Fixtures;
 
-use App\Models\Dm\Users;
-use App\Models\EdgeCreator\EdgecreatorIntervalles;
-use App\Models\EdgeCreator\EdgecreatorModeles2;
-use App\Models\EdgeCreator\EdgecreatorValeurs;
-use App\Models\EdgeCreator\ImagesTranches;
-use App\Models\EdgeCreator\TranchesEnCoursContributeurs;
-use App\Models\EdgeCreator\TranchesEnCoursModeles;
-use App\Models\EdgeCreator\TranchesEnCoursModelesImages;
-use App\Models\EdgeCreator\TranchesEnCoursValeurs;
+use App\Entity\Dm\Users;
+use App\Entity\EdgeCreator\EdgecreatorIntervalles;
+use App\Entity\EdgeCreator\EdgecreatorModeles2;
+use App\Entity\EdgeCreator\EdgecreatorValeurs;
+use App\Entity\EdgeCreator\ImagesTranches;
+use App\Entity\EdgeCreator\TranchesEnCoursContributeurs;
+use App\Entity\EdgeCreator\TranchesEnCoursModeles;
+use App\Entity\EdgeCreator\TranchesEnCoursModelesImages;
+use App\Entity\EdgeCreator\TranchesEnCoursValeurs;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -112,7 +112,7 @@ class EdgeCreatorFixture implements FixtureInterface
     {
         self::createModelEcV1($ecEntityManager, $this->user->getUsername(), 'fr/DDD', 1, 'Remplir', 'Couleur', '#FF0000', 1, 3);
 
-        // Models v2
+        // Model v2
 
         // $ongoingModel1
         self::createModelEcV2($ecEntityManager, $this->user->getUsername(), 'fr/PM', '502', [

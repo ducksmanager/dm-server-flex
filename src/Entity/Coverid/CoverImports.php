@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Coverid;
+namespace App\Entity\Coverid;
 
 use Doctrine\ORM\Mapping as ORM;
 

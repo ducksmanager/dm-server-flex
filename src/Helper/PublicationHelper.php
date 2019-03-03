@@ -1,7 +1,7 @@
 <?php
 namespace App\Helper;
 
-use App\Models\Dm\Numeros;
+use App\Entity\Dm\Numeros;
 
 class PublicationHelper {
     public static function getPublicationCode(Numeros $issue) {

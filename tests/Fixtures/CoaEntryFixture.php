@@ -2,10 +2,10 @@
 
 namespace App\Tests\Fixtures;
 
-use App\Models\Coa\InducksEntry;
-use App\Models\Coa\InducksEntryurl;
-use App\Models\Coa\InducksIssue;
-use App\Models\Coa\InducksStoryversion;
+use App\Entity\Coa\InducksEntry;
+use App\Entity\Coa\InducksEntryurl;
+use App\Entity\Coa\InducksIssue;
+use App\Entity\Coa\InducksStoryversion;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 

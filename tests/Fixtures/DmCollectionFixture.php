@@ -2,11 +2,11 @@
 
 namespace App\Tests\Fixtures;
 
-use App\Models\Dm\Achats;
-use App\Models\Dm\BibliothequeOrdreMagazines;
-use App\Models\Dm\Numeros;
-use App\Models\Dm\Users;
-use App\Models\Dm\UsersPermissions;
+use App\Entity\Dm\Achats;
+use App\Entity\Dm\BibliothequeOrdreMagazines;
+use App\Entity\Dm\Numeros;
+use App\Entity\Dm\Users;
+use App\Entity\Dm\UsersPermissions;
 use App\Tests\TestCommon;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;

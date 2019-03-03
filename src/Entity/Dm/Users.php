@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Models\Dm;
+namespace App\Entity\Dm;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * Users

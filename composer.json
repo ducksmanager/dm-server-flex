@@ -88,7 +88,6 @@
         "symfony/css-selector": "4.2.*",
         "symfony/maker-bundle": "^1.11",
         "symfony/phpunit-bridge": "4.2.*",
-        "symfony/web-server-bundle": "4.2.*",
-	    "ext-exif": "*"
+        "symfony/web-server-bundle": "4.2.*"
 	}
 }

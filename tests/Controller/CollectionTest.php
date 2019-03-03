@@ -1,9 +1,9 @@
 <?php
 namespace App\Tests\Controller;
 
-use App\Models\Dm\Achats;
-use App\Models\Dm\BibliothequeOrdreMagazines;
-use App\Models\Dm\Numeros;
+use App\Entity\Dm\Achats;
+use App\Entity\Dm\BibliothequeOrdreMagazines;
+use App\Entity\Dm\Numeros;
 use App\Tests\TestCommon;
 use Symfony\Component\HttpFoundation\Response;
 

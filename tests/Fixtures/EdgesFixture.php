@@ -2,8 +2,8 @@
 
 namespace App\Tests\Fixtures;
 
-use App\Models\Dm\TranchesDoublons;
-use App\Models\Dm\TranchesPretes;
+use App\Entity\Dm\TranchesDoublons;
+use App\Entity\Dm\TranchesPretes;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 

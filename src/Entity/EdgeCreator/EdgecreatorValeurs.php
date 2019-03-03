@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\EdgeCreator;
+namespace App\Entity\EdgeCreator;
 
 use Doctrine\ORM\Mapping as ORM;
 

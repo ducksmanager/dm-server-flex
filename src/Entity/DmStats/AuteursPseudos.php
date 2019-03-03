@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\DmStats;
+namespace App\Entity\DmStats;
 
 use Doctrine\ORM\Mapping as ORM;
 

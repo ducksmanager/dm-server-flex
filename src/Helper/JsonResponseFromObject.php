@@ -1,7 +1,7 @@
 <?php
 namespace App\Helper;
 
-use App\Models\EdgeCreator\TranchesEnCoursModeles;
+use App\Entity\EdgeCreator\TranchesEnCoursModeles;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;

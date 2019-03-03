@@ -1,7 +1,7 @@
 <?php
 namespace App\Tests\Controller;
 
-use App\Models\Coverid\Covers;
+use App\Entity\Coverid\Covers;
 use App\Tests\TestCommon;
 use Symfony\Component\HttpFoundation\Response;
 
