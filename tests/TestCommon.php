@@ -90,7 +90,6 @@ abstract class TestCommon extends WebTestCase {
     ): TestServiceCallCommon
     {
         self::getClient()->disableReboot();
-        self::getClient()->getContainer()->set('session', new Session(new MockFileSessionStorage()));
         $service = new TestServiceCallCommon(self::getClient());
         $service->setPath($path);
         $service->setUserCredentials($userCredentials);

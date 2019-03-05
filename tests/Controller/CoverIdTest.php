@@ -14,9 +14,10 @@ use Symfony\Component\HttpFoundation\Response;
 class CoverIdTest extends TestCommon
 {
 
-    public static $uploadDestination = ['/tmp', 'test.jpg'];
+    public static $uploadDestination = '/tmp/test.jpg';
 
     public static $exampleImageToUpload = 'cover_example_to_upload.jpg';
+    public static $imageToUpload = 'cover_example_to_upload_willberemoved.jpg';
 
     public static $coverSearchResultsSimple = [
         'bounding_rects' => [
@@ -63,16 +64,13 @@ class CoverIdTest extends TestCommon
             $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
         }
 
-        @unlink('/tmp/test.jpg');
-
-//        @unlink(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
-//        copy(self::getPathToFileToUpload(self::$exampleImage), self::getPathToFileToUpload(self::$exampleImageToUpload));
+        @unlink(self::$uploadDestination);
     }
 
     public function tearDown()
     {
         parent::tearDown();
-//        @unlink(self::getPathToFileToUpload(self::$exampleImageToUpload));
+        @unlink(self::$imageToUpload);
     }
 
     private function mockCoverSearchResults($mockedResponse): void
@@ -121,7 +119,7 @@ class CoverIdTest extends TestCommon
     {
         $coverId1 = $this->getEm('coverid')->getRepository(Covers::class)->find(1);
         $this->mockCoverSearchResults(self::$coverSearchResultsSimple);
-        $this->assertFileNotExists(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
+        $this->assertFileNotExists(self::$uploadDestination);
 
         $similarCoverIssuePublicationCode = 'fr/DDD';
         $similarCoverIssueNumber = '10';
@@ -135,7 +133,7 @@ class CoverIdTest extends TestCommon
             ]
         )->call();
 
-        $this->assertFileExists(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
+        $this->assertFileExists(self::$uploadDestination);
         $this->assertJsonStringEqualsJsonString(json_encode([
             'issues' => [
                 'fr/DDD 1' => [
@@ -153,7 +151,7 @@ class CoverIdTest extends TestCommon
     public function testCoverIdSearchManyResults(): void
     {
         $this->mockCoverSearchResults(self::$coverSearchResultsMany);
-        $this->assertFileNotExists(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
+        $this->assertFileNotExists(self::$uploadDestination);
 
         $similarCoverIssuePublicationCode = 'fr/DDD';
         $similarCoverIssueNumber = '10';
@@ -169,7 +167,7 @@ class CoverIdTest extends TestCommon
             ]
         )->call();
 
-        $this->assertFileExists(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
+        $this->assertFileExists(self::$uploadDestination);
         $this->assertJsonStringEqualsJsonString(json_encode([
             'issues' => [
                 'fr/DDD 1' => [
@@ -211,7 +209,7 @@ class CoverIdTest extends TestCommon
             'type' => 'IMAGE_SIZE_TOO_SMALL'
         ]);
 
-        $this->assertFileNotExists(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
+        $this->assertFileNotExists(self::$uploadDestination);
 
         $response = $this->buildAuthenticatedServiceWithTestUser(
             '/cover-id/search', self::$dmUser, 'POST', [], [
@@ -227,7 +225,7 @@ class CoverIdTest extends TestCommon
     public function testCoverIdSearchInvalidFileName(): void
     {
         $this->mockCoverSearchResults(self::$coverSearchResultsSimple);
-        $this->assertFileNotExists(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
+        $this->assertFileNotExists(self::$uploadDestination);
 
         $response = $this->buildAuthenticatedServiceWithTestUser(
             '/cover-id/search', self::$dmUser, 'POST', [], [
@@ -247,17 +245,17 @@ class CoverIdTest extends TestCommon
         $response = $this->buildAuthenticatedServiceWithTestUser('/cover-id/download/1', self::$dmUser)
             ->call();
 
-        file_put_contents('/tmp/test.jpg', $this->getResponseContent($response));
-        $type=\exif_imagetype('/tmp/test.jpg');
+        file_put_contents(self::$uploadDestination, $this->getResponseContent($response));
+        $type=\exif_imagetype(self::$uploadDestination);
         $this->assertEquals(IMAGETYPE_JPEG, $type);
-
     }
 
     private static function getCoverIdSearchUploadImage(): UploadedFile
     {
+        copy(self::getPathToFileToUpload(self::$exampleImageToUpload), self::getPathToFileToUpload(self::$imageToUpload));
         return new UploadedFile(
-            self::getPathToFileToUpload(self::$exampleImageToUpload),
-            self::$exampleImageToUpload,
+            self::getPathToFileToUpload(self::$imageToUpload),
+            self::$imageToUpload,
             'image/jpeg'
         );
     }
