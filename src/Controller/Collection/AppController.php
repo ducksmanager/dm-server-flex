@@ -12,6 +12,7 @@ use App\Entity\Dm\Numeros;
 use App\EntityTransform\FetchCollectionResult;
 use App\EntityTransform\NumeroSimple;
 use App\EntityTransform\UpdateCollectionResult;
+use App\Helper\collectionUpdateHelper;
 use App\Helper\PublicationHelper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -22,6 +23,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AppController extends AbstractController implements RequiresDmVersionController, RequiresDmUserController
 {
+    use collectionUpdateHelper;
+
     /**
      * @Route(methods={"GET"}, path="/collection/issues")
      */
@@ -101,12 +104,14 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         }
 
         [$nbUpdated, $nbCreated] = $this->addOrChangeIssues(
-             $country,
-             $publication,
-             $issuenumbers,
-             $condition,
-             $istosell,
-             $purchaseid
+            $this->getEm('dm'),
+            $this->getCurrentUser()['id'],
+            $country,
+            $publication,
+            $issuenumbers,
+            $condition,
+            $istosell,
+            $purchaseid
         );
         return new JsonResponse(self::getSimpleArray([
             new UpdateCollectionResult('UPDATE', $nbUpdated),
@@ -115,7 +120,10 @@ class AppController extends AbstractController implements RequiresDmVersionContr
     }
 
     /**
-     * @Route(methods={"POST"}, path="/collection/purchases/{purchaseId}")
+     * @Route(
+     *     methods={"POST"},
+     *     path="/collection/purchases/{purchaseId}",
+     *     defaults={"purchaseId"="NEW"})
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -128,14 +136,14 @@ class AppController extends AbstractController implements RequiresDmVersionContr
         $purchaseDescription = $request->request->get('description');
         $idUser = $this->getCurrentUser()['id'];
 
-        if (!is_null($purchaseId)) {
+        if ($purchaseId === 'NEW') {
+            $purchase = new Achats();
+        }
+        else {
             $purchase = $dmEm->getRepository(Achats::class)->findOneBy(['idAcquisition' => $purchaseId, 'idUser' => $idUser]);
             if (is_null($purchase)) {
                 return new Response('You don\'t have the rights to update this purchase', Response::HTTP_UNAUTHORIZED);
             }
-        }
-        else {
-            $purchase = new Achats();
         }
 
         $purchase->setIdUser($idUser);
@@ -301,78 +309,5 @@ class AppController extends AbstractController implements RequiresDmVersionContr
             ->setParameter(':userId', $this->getCurrentUser()['id']);
 
         return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\Query\QueryException
-     */
-    private function addOrChangeIssues(string $country, string $publication, array $issuenumbers, ?string $condition, ?bool $istosell, ?int $purchaseid): array
-    {
-        $conditionNewIssues = is_null($condition) ? 'possede' : $condition;
-        $istosellNewIssues = is_null($istosell) ? false : $istosell;
-        $purchaseidNewIssues = is_null($purchaseid) ? -2 : $purchaseid; // TODO allow NULL
-
-        /** @var EntityManager $dmEm */
-        $dmEm = $this->container->get('doctrine')->getManager('dm');
-        $qb = $dmEm->createQueryBuilder();
-        $qb
-            ->select('issues')
-            ->from(Numeros::class, 'issues')
-
-            ->andWhere($qb->expr()->eq('issues.pays', ':country'))
-            ->setParameter(':country', $country)
-
-            ->andWhere($qb->expr()->eq('issues.magazine', ':publication'))
-            ->setParameter(':publication', $publication)
-
-            ->andWhere($qb->expr()->in('issues.numero', ':issuenumbers'))
-            ->setParameter(':issuenumbers', $issuenumbers)
-
-            ->andWhere($qb->expr()->eq('issues.idUtilisateur', ':userId'))
-            ->setParameter(':userId', $this->getCurrentUser()['id'])
-
-            ->indexBy('issues', 'issues.numero');
-
-        /** @var Numeros[] $existingIssues */
-        $existingIssues = $qb->getQuery()->getResult();
-
-        foreach($existingIssues as $existingIssue) {
-            if (!is_null($condition)) {
-                $existingIssue->setEtat($condition);
-            }
-            if (!is_null($istosell)) {
-                $existingIssue->setAv($istosell);
-            }
-            if (!is_null($purchaseid)) {
-                $existingIssue->setIdAcquisition($purchaseid);
-            }
-            $dmEm->persist($existingIssue);
-        }
-
-        $issueNumbersToCreate = array_diff($issuenumbers, array_keys($existingIssues));
-        foreach($issueNumbersToCreate as $issueNumberToCreate) {
-            $newIssue = new Numeros();
-            $newIssue->setPays($country);
-            $newIssue->setMagazine($publication);
-            $newIssue->setNumero($issueNumberToCreate);
-            $newIssue->setEtat($conditionNewIssues);
-            $newIssue->setAv($istosellNewIssues);
-            $newIssue->setIdAcquisition($purchaseidNewIssues);
-            $newIssue->setIdUtilisateur($this->getCurrentUser()['id']);
-            $newIssue->setDateajout(new \DateTime());
-
-            $dmEm->persist($newIssue);
-        }
-
-        $dmEm->flush();
-        $dmEm->clear();
-
-        $updateResult = count($existingIssues);
-        $creationResult = count($issueNumbersToCreate);
-
-        return [$updateResult, $creationResult];
     }
 }

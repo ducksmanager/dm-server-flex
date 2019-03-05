@@ -99,7 +99,7 @@ class StatusTest extends TestCommon
         $this->spinUp('dm');
         $this->spinUp('coa');
         $this->spinUp('coverid');
-        $this->spinUp('dmstats');
+        $this->spinUp('dm_stats');
         $this->spinUp('edgecreator');
 
         $this->createUserCollection('dm_test_user');
@@ -114,7 +114,7 @@ class StatusTest extends TestCommon
             $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
         }
         $this->loadFixture('edgecreator', new EdgeCreatorFixture($this->getUser('dm_test_user')));
-        $this->loadFixture('dmstats', new DmStatsFixture(1));
+        $this->loadFixture('dm_stats', new DmStatsFixture(1));
 
         $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
 
@@ -125,7 +125,7 @@ class StatusTest extends TestCommon
         $this->spinUp('dm');
         $this->spinUp('coa');
         $this->spinUp('coverid');
-        $this->spinUp('dmstats');
+        $this->spinUp('dm_stats');
         $this->spinUp('edgecreator');
         $this->createUserCollection('dm_test_user');
         $urls = [
@@ -138,7 +138,7 @@ class StatusTest extends TestCommon
             $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
         }
         $this->loadFixture('edgecreator', new EdgeCreatorFixture($this->getUser('dm_test_user')));
-        $this->loadFixture('dmstats', new DmStatsFixture(1));
+        $this->loadFixture('dm_stats', new DmStatsFixture(1));
 
         $response = $this->buildAuthenticatedService('/status/db', self::$dmUser, [], [], 'GET')->call();
 

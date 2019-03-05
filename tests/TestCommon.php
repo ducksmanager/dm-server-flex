@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 
 abstract class TestCommon extends WebTestCase {
 
@@ -88,6 +90,7 @@ abstract class TestCommon extends WebTestCase {
     ): TestServiceCallCommon
     {
         self::getClient()->disableReboot();
+        self::getClient()->getContainer()->set('session', new Session(new MockFileSessionStorage()));
         $service = new TestServiceCallCommon(self::getClient());
         $service->setPath($path);
         $service->setUserCredentials($userCredentials);
@@ -190,9 +193,9 @@ abstract class TestCommon extends WebTestCase {
         $executor->execute($loader->getFixtures(), true);
     }
 
-    protected function createUserCollection($username): void
+    protected function createUserCollection($username, $roles = [], $withPublicationSorts = true): void
     {
-        $this->loadFixture('dm', new DmCollectionFixture($username));
+        $this->loadFixture('dm', new DmCollectionFixture($username, $roles, $withPublicationSorts));
     }
 
     /**

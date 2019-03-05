@@ -56,7 +56,7 @@ class AppController extends AbstractController
             'dm' => 'SELECT * FROM users LIMIT 1',
             'coa' => self::generateRowCheckOnTables($this->getEm('coa')),
             'coverid' => 'SELECT ID, issuecode, url FROM covers LIMIT 1',
-            'dmstats' => 'SELECT * FROM utilisateurs_histoires_manquantes LIMIT 1',
+            'dm_stats' => 'SELECT * FROM utilisateurs_histoires_manquantes LIMIT 1',
             'edgecreator' => 'SELECT * FROM edgecreator_modeles2 LIMIT 1'
         ];
         foreach ($databaseChecks as $db=>$dbCheckQuery) {

@@ -7,9 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
 {
-    protected function callService(string $class, string $function, array $parameters): Response
+    protected function callService(string $class, string $function, array $parameters = [], array $query = []): Response
     {
-        return $this->forward($class.'::'.$function, $parameters);
+        return $this->forward($class.'::'.$function, $parameters, $query);
     }
 
     protected static function getSerializedArray(array $array): array

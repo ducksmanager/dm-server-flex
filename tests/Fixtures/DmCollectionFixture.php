@@ -15,12 +15,17 @@ class DmCollectionFixture implements FixtureInterface
 {
     protected $username;
     protected $roles = [];
+    protected $withPublicationSorts = true;
 
     /**
      * @param string $username
+     * @param string[] $roles
+     * @param boolean $withPublicationSorts
      */
-    public function __construct(string $username = null) {
+    public function __construct(string $username = null, $roles = [], $withPublicationSorts = true) {
         $this->username = $username;
+        $this->roles = $roles;
+        $this->withPublicationSorts = $withPublicationSorts;
     }
 
     /**
@@ -112,22 +117,23 @@ class DmCollectionFixture implements FixtureInterface
                     ->setIdUser($user->getId())
             );
 
-            $publicationSort1 = new BibliothequeOrdreMagazines();
-            $dmEntityManager->persist(
-                $publicationSort1
-                    ->setPublicationcode('fr/DDD')
-                    ->setIdUtilisateur($user->getId())
-                    ->setOrdre(1)
-            );
+            if ($this->withPublicationSorts) {
+                $publicationSort1 = new BibliothequeOrdreMagazines();
+                $dmEntityManager->persist(
+                    $publicationSort1
+                        ->setPublicationcode('fr/DDD')
+                        ->setIdUtilisateur($user->getId())
+                        ->setOrdre(1)
+                );
 
-            $publicationSort2 = new BibliothequeOrdreMagazines();
-            $dmEntityManager->persist(
-                $publicationSort2
-                    ->setPublicationcode('fr/JM')
-                    ->setIdUtilisateur($user->getId())
-                    ->setOrdre(2)
-            );
-
+                $publicationSort2 = new BibliothequeOrdreMagazines();
+                $dmEntityManager->persist(
+                    $publicationSort2
+                        ->setPublicationcode('fr/JM')
+                        ->setIdUtilisateur($user->getId())
+                        ->setOrdre(2)
+                );
+            }
 
             $dmEntityManager->flush();
             $dmEntityManager->clear();

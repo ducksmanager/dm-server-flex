@@ -7,7 +7,7 @@ class StatsTest extends TestCommon
 {
     protected function getEmNamesToCreate(): array
     {
-        return ['dm', 'coa', 'dmstats'];
+        return ['dm', 'coa', 'dm_stats'];
     }
 
     public function setUp()
@@ -15,7 +15,7 @@ class StatsTest extends TestCommon
         parent::setUp();
         $this->createUserCollection('dm_test_user');
         self::runCommand('doctrine:fixtures:load -q -n --em=coa --group=coa');
-        $this->loadFixture('dmstats', new DmStatsFixture(1));
+        $this->loadFixture('dm_stats', new DmStatsFixture(1));
     }
 
     public function testGetWatchedAuthors(): void

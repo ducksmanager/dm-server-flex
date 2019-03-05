@@ -2,12 +2,9 @@
 
 namespace App\Controller;
 
-use App\Controller\RequiresDmUserController;
-use PharIo\Version\InvalidVersionException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -30,7 +27,7 @@ class RequiresDmVersionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::CONTROLLER => 'onKernelController',
+            KernelEvents::CONTROLLER => ['onKernelController', 1],
         ];
     }
 }

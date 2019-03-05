@@ -196,7 +196,7 @@ class CollectionTest extends TestCommon
             ])->call();
 
         /** @var Achats $updatedPurchase */
-        $updatedPurchase = $this->getEm('dm')->getRepository(Achats::class)->find($purchaseToUpdate);
+        $updatedPurchase = $this->getEm('dm')->getRepository(Achats::class)->find($purchaseToUpdate->getIdAcquisition());
 
         $this->assertEquals(\DateTime::createFromFormat('Y-m-d H:i:s', '2017-01-01 00:00:00'), $updatedPurchase->getDate());
         $this->assertEquals('New description', $updatedPurchase->getDescription());
@@ -287,7 +287,6 @@ class CollectionTest extends TestCommon
         self::runCommand('doctrine:fixtures:load -q -n --em=coa --group=coa');
         $this->createUserCollection('dm_test_user');
 
-
         $response = $this->buildAuthenticatedServiceWithTestUser('/collection/inducks/import/init', self::$dmUser, 'POST', ['rawData' => implode("\n", [
             'country^entrycode^collectiontype^comment',
             'de^MM1951-00^^',
@@ -332,7 +331,6 @@ class CollectionTest extends TestCommon
     public function testImportFromInducksWithExistingIssues(): void
     {
         $this->createUserCollection('dm_test_user');
-
 
         $response = $this->buildAuthenticatedServiceWithTestUser('/collection/inducks/import', self::$dmUser, 'POST', ['issues' => [
             ['publicationcode' => 'fr/AJM', 'issuenumber' => '58'],

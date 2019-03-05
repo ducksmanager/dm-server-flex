@@ -132,7 +132,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     private function getMissingStoriesCount() : array
     {
-        $qbMissingStoryCountPerAuthor = $this->getEm('dmstats')->createQueryBuilder();
+        $qbMissingStoryCountPerAuthor = $this->getEm('dm_stats')->createQueryBuilder();
         $qbMissingStoryCountPerAuthor
             ->select('author_stories_missing_for_user.personcode, COUNT(author_stories_missing_for_user.storycode) AS storyNumber')
             ->from(UtilisateursHistoiresManquantes::class, 'author_stories_missing_for_user')
@@ -152,7 +152,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     private function getStoriesCount(array $personCodes) : array
     {
-        $qbStoryCountPerAuthor = $this->getEm('dmstats')->createQueryBuilder();
+        $qbStoryCountPerAuthor = $this->getEm('dm_stats')->createQueryBuilder();
         $qbStoryCountPerAuthor
             ->select('author_stories.personcode, COUNT(author_stories.storycode) AS storyNumber')
             ->from(AuteursHistoires::class, 'author_stories')
@@ -172,7 +172,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
 
     private function getSuggestedIssues(string $countryCode) : array
     {
-        $qbGetMostWantedSuggestions = $this->getEm('dmstats')->createQueryBuilder();
+        $qbGetMostWantedSuggestions = $this->getEm('dm_stats')->createQueryBuilder();
 
         $qbGetMostWantedSuggestions
             ->select('most_suggested.publicationcode', 'most_suggested.issuenumber')
@@ -194,7 +194,7 @@ class AppController extends AbstractController implements RequiresDmVersionContr
             return implode('', [$suggestion['publicationcode'], $suggestion['issuenumber']]);
         }, $mostWantedSuggestionsResults);
 
-        $qbGetSuggestionDetails = $this->getEm('dmstats')->createQueryBuilder();
+        $qbGetSuggestionDetails = $this->getEm('dm_stats')->createQueryBuilder();
 
         $qbGetSuggestionDetails
             ->select('missing.personcode, missing.storycode, ' .

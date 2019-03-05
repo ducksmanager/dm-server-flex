@@ -49,7 +49,7 @@ doctrine:
                 charset: utf8mb4
                 mapping_types:
                     enum: string
-            dmstats:
+            dm_stats:
                 dbname: '%env(DATABASE_DM_STATS_DB)%'
                 host: '%env(DATABASE_DM_STATS_HOST)%'
                 port: '%env(DATABASE_DM_STATS_PORT)%'
@@ -104,8 +104,8 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity/Coverid'
                         prefix: 'App\Entity\Coverid'
                         alias: Coverid
-            dmstats:
-                connection: dmstats
+            dm_stats:
+                connection: dm_stats
                 mappings:
                     App:
                         is_bundle: false

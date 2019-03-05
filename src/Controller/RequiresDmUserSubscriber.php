@@ -29,39 +29,43 @@ class RequiresDmUserSubscriber implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $request = $event->getRequest();
         $controller = $event->getController();
 
-        if (is_array($controller)) {
-            if ($controller[0] instanceof RequiresDmUserController) {
-                $username = $event->getRequest()->headers->get('x-dm-user');
-                $password = $event->getRequest()->headers->get('x-dm-pass');
-                if (isset($username, $password)) {
-                    $this->logger->info("Authenticating $username...");
-                    $qb = $this->dmEm->createQueryBuilder();
-                    $qb
-                        ->select('DISTINCT u')
-                        ->from(Users::class, 'u')
-                        ->andWhere($qb->expr()->eq('u.username', ':username'))
-                        ->andWhere($qb->expr()->eq('u.password', ':password'));
+        if (is_array($controller) && !$controller[0] instanceof ExceptionController) {
+            if (!is_null($request->getSession()) && $request->getSession()->has('user')) {
+                return;
+            }
+            $username = $event->getRequest()->headers->get('x-dm-user');
+            $password = $event->getRequest()->headers->get('x-dm-pass');
+            if (isset($username, $password)) {
+                $this->logger->info("Authenticating $username...");
+                $qb = $this->dmEm->createQueryBuilder();
+                $qb
+                    ->select('DISTINCT u')
+                    ->from(Users::class, 'u')
+                    ->andWhere($qb->expr()->eq('u.username', ':username'))
+                    ->andWhere($qb->expr()->eq('u.password', ':password'));
 
-                    $qb->setParameters([':username' => $username, 'password' => $password]);
+                $qb->setParameters([':username' => $username, 'password' => $password]);
 
-                    try {
-                        $sql=$qb->getQuery()->getSQL();
-                        /** @var Users $existingUser */
-                        $existingUser = $qb->getQuery()->getSingleResult();
-                        $request->getSession()->set('user', ['username' => $existingUser->getUsername(), 'id' => $existingUser->getId()]);
-                        $this->logger->info("$username is logged in");
-                    } catch (NoResultException|NonUniqueResultException $e) {
+                try {
+                    /** @var Users $existingUser */
+                    $existingUser = $qb->getQuery()->getSingleResult();
+                    $request->getSession()->set('user', ['username' => $existingUser->getUsername(), 'id' => $existingUser->getId()]);
+                    $this->logger->info("$username is logged in");
+                } catch (NoResultException|NonUniqueResultException $e) {
+                    if ($controller[0] instanceof RequiresDmUserController) {
                         throw new UnauthorizedHttpException('Invalid credentials!');
                     }
+
+                    $this->logger->warning("Invalid credentials for $username but they were not required");
                 }
-                else {
-                    throw new UnauthorizedHttpException('Credentials are required!');
-                }
+            }
+            else if ($controller[0] instanceof RequiresDmUserController) {
+                throw new UnauthorizedHttpException('', 'Credentials are required!');
             }
         }
     }
@@ -69,7 +73,7 @@ class RequiresDmUserSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::CONTROLLER => 'onKernelController',
+            KernelEvents::CONTROLLER => ['onKernelController', 2],
         ];
     }
 }

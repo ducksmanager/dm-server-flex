@@ -11,16 +11,17 @@ security:
                     whattheduck: { password: '%env(ROLE_PASSWORD_WHATTHEDUCK)%', roles: [ 'ROLE_COLLECTION' ] }
                     edgecreator: { password: '%env(ROLE_PASSWORD_EDGECREATOR)%', roles: [ 'ROLE_EDGECREATOR' ] }
                     rawsql: { password: '%env(ROLE_PASSWORD_RAWSQL)%', roles: [ 'ROLE_RAWSQL' ] }
+                    admin: { password: '%env(ROLE_PASSWORD_ADMIN)%', roles: [ 'ROLE_ADMIN' ] }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            pattern: ^/(?!status)/
+            pattern: ^/(?!status).+
             http_basic: ~
 
     access_control:
         - { path: ^/rawsql, roles: ROLE_RAWSQL }
-        - { path: ^/ducksmanager/resetDemo, roles: ROLE_RESETDEMO }
+        - { path: ^/ducksmanager/resetDemo, roles: ROLE_ADMIN }
         - { path: ^/collection/, roles: ROLE_COLLECTION }
         - { path: ^/edgecreator/, roles: ROLE_EDGECREATOR }

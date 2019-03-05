@@ -6,6 +6,7 @@
 parameters:
     twig.controller.exception.class: App\Controller\ExceptionController
     debug: false
+    locale: 'fr'
 
 services:
     # default configuration for services in *this* file
