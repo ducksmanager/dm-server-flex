@@ -54,23 +54,25 @@ class CoverIdTest extends TestCommon
         parent::setUp();
         self::runCommand('doctrine:fixtures:load -q -n --em=coa --group=coa');
         $urls = [
-            'fr/DDD 1' => '2010/12/fr_ddd_001a_001.jpg',
-            'fr/DDD 2' => '2010/12/fr_ddd_002a_001.jpg',
-            'fr/MP 300' => '2010/12/fr_mp_0300a_001.jpg',
-            'fr/XXX 111' => '2010/12/fr_xxx_111_001.jpg'
+            'fr/DDD 1' => 'cover_example.jpg',
+            'fr/DDD 2' => 'cover_example_2.jpg',
+            'fr/MP 300' => 'cover_example_3.jpg',
+            'fr/XXX 111' => 'cover_example_4.jpg'
         ];
         foreach($urls as $issueNumber => $url) {
             $this->loadFixture('coverid', new CoverIdFixture($issueNumber, $url));
         }
 
-        @unlink(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
-        copy(self::getPathToFileToUpload(self::$exampleImage), self::getPathToFileToUpload(self::$exampleImageToUpload));
+        @unlink('/tmp/test.jpg');
+
+//        @unlink(implode(DIRECTORY_SEPARATOR, self::$uploadDestination));
+//        copy(self::getPathToFileToUpload(self::$exampleImage), self::getPathToFileToUpload(self::$exampleImageToUpload));
     }
 
     public function tearDown()
     {
         parent::tearDown();
-        @unlink(self::getPathToFileToUpload(self::$exampleImageToUpload));
+//        @unlink(self::getPathToFileToUpload(self::$exampleImageToUpload));
     }
 
     private function mockCoverSearchResults($mockedResponse): void

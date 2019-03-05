@@ -9,6 +9,7 @@ use App\Entity\Coa\InducksIssue;
 use App\Entity\Dm\Achats;
 use App\Entity\Dm\BibliothequeOrdreMagazines;
 use App\Entity\Dm\Numeros;
+use App\Entity\Dm\UsersPermissions;
 use App\EntityTransform\FetchCollectionResult;
 use App\EntityTransform\NumeroSimple;
 use App\EntityTransform\UpdateCollectionResult;
@@ -270,6 +271,24 @@ class AppController extends AbstractController implements RequiresDmVersionContr
             'importedIssuesCount' => count($newIssues),
             'existingIssuesCount' => count($issues) - count($newIssues)
         ]);
+    }
+
+    /**
+     * @Route(methods={"GET"}, path="/collection/privileges")
+     */
+    public function getUserPrivileges(): JsonResponse
+    {
+        $privileges = $this->getEm('dm')->getRepository(UsersPermissions::class)->findBy([
+            'username' => $this->getCurrentUser()['username']
+        ]);
+
+        $privilegesAssoc = [];
+
+        array_walk($privileges, function(UsersPermissions $value) use(&$privilegesAssoc) {
+            $privilegesAssoc[$value->getRole()] = $value->getPrivilege();
+        });
+
+        return new JsonResponse($privilegesAssoc);
     }
 
     private function getNonPossessedIssues(array $issues, int $userId): array

@@ -180,18 +180,6 @@ class DucksManagerTest extends TestCommon implements RequiresDmVersionController
         $this->assertEquals('demo', $objectResponse->username);
     }
 
-    public function testGetPrivileges(): void
-    {
-        $this->createUserCollection('demo', ['EdgeCreator' => 'Affichage']);
-        $sha1Password = sha1('password');
-        $response = $this->buildAuthenticatedService('/ducksmanager/privileges', self::$dmUser, [
-            'username' => 'demo',
-            'password' => $sha1Password
-        ], [], 'GET')->call();
-        $objectResponse = json_decode($this->getResponseContent($response));
-        $this->assertEquals('Affichage', $objectResponse->EdgeCreator);
-    }
-
     public function testInitResetPassword(): void
     {
         $this->createUserCollection('dm_test_user');

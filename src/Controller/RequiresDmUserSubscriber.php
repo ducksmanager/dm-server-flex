@@ -34,10 +34,7 @@ class RequiresDmUserSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $controller = $event->getController();
 
-        if (is_array($controller) && !$controller[0] instanceof ExceptionController) {
-            if (!is_null($request->getSession()) && $request->getSession()->has('user')) {
-                return;
-            }
+        if (is_array($controller) && $controller[0] instanceof RequiresDmUserController) {
             $username = $event->getRequest()->headers->get('x-dm-user');
             $password = $event->getRequest()->headers->get('x-dm-pass');
             if (isset($username, $password)) {
@@ -57,15 +54,11 @@ class RequiresDmUserSubscriber implements EventSubscriberInterface
                     $request->getSession()->set('user', ['username' => $existingUser->getUsername(), 'id' => $existingUser->getId()]);
                     $this->logger->info("$username is logged in");
                 } catch (NoResultException|NonUniqueResultException $e) {
-                    if ($controller[0] instanceof RequiresDmUserController) {
-                        throw new UnauthorizedHttpException('Invalid credentials!');
-                    }
-
-                    $this->logger->warning("Invalid credentials for $username but they were not required");
+                    throw new UnauthorizedHttpException('Invalid credentials!');
                 }
             }
-            else if ($controller[0] instanceof RequiresDmUserController) {
-                throw new UnauthorizedHttpException('', 'Credentials are required!');
+            else {
+                throw new UnauthorizedHttpException('Credentials are required!');
             }
         }
     }

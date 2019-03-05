@@ -341,24 +341,6 @@ class AppController extends AbstractController
         return new Response();
     }
 
-    /**
-     * @Route(methods={"GET"}, path="/ducksmanager/privileges")
-     */
-    public function getUserPrivileges(): JsonResponse
-    {
-        $privileges = $this->getEm('dm')->getRepository(UsersPermissions::class)->findBy([
-            'username' => $this->getCurrentUser()['username']
-        ]);
-
-        $privilegesAssoc = [];
-
-        array_walk($privileges, function(UsersPermissions $value) use(&$privilegesAssoc) {
-            $privilegesAssoc[$value->getRole()] = $value->getPrivilege();
-        });
-
-        return new JsonResponse($privilegesAssoc);
-    }
-
     private function checkNewUser(?string $username, string $password, string $password2)
     {
         if (isset($username)) {

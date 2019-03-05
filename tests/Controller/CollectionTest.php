@@ -346,4 +346,16 @@ class CollectionTest extends TestCommon
         $this->assertEquals(4, $objectResponse->importedIssuesCount);
         $this->assertEquals(1, $objectResponse->existingIssuesCount);
     }
+
+    public function testGetPrivileges(): void
+    {
+        $this->createUserCollection('demo', ['EdgeCreator' => 'Affichage']);
+        $sha1Password = sha1('password');
+        $response = $this->buildAuthenticatedService('/collection/privileges', self::$dmUser, [
+            'username' => 'demo',
+            'password' => $sha1Password
+        ], [], 'GET')->call();
+        $objectResponse = json_decode($this->getResponseContent($response));
+        $this->assertEquals('Affichage', $objectResponse->EdgeCreator);
+    }
 }

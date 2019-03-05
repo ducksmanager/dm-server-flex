@@ -28,9 +28,9 @@ class CoverIdFixture implements FixtureInterface
                 ->setUrl($this->url)
         );
 
-        @mkdir($_ENV['IMAGE_REMOTE_ROOT'].dirname($this->url), 0777, true);
-        $imagePath = self::getPathToFileToUpload(TestCommon::$exampleImage);
-        copy($imagePath, $_ENV['IMAGE_REMOTE_ROOT'] . $this->url);
+//        @mkdir($_ENV['IMAGE_REMOTE_ROOT'].dirname($this->url), 0777, true);
+//        $imagePath = self::getPathToFileToUpload(TestCommon::$exampleImage);
+//        copy($imagePath, $_ENV['IMAGE_REMOTE_ROOT'] . $this->url);
 
         $dmEntityManager->flush();
     }
